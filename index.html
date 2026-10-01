@@ -1,239 +1,2276 @@
-<style>
-*{box-sizing:border-box}
+<script>
 
-body{
-  margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
-  background:#f4f7f7;
-  color:#17202a;
-  font-size:16px
+const KEY="currentBillTrackerV1";
+
+
+/* =========================
+   DEFAULT DATABASE
+========================= */
+
+let db={
+
+  meters:[
+    {
+      id:"m1",
+      name:"মিটার–১",
+      number:"",
+      opening:0,
+      openingDate:todayISO()
+    },
+    {
+      id:"m2",
+      name:"মিটার–২",
+      number:"",
+      opening:0,
+      openingDate:todayISO()
+    }
+  ],
+
+  rates:[
+    {from:0,to:50,rate:5},
+    {from:51,to:75,rate:6},
+    {from:76,to:100,rate:7},
+    {from:101,to:150,rate:8},
+    {from:151,to:200,rate:9}
+  ],
+
+  readings:[],
+
+  charges:{
+    energy:42,
+    rent:10
+  },
+
+  vat:[]
+
+};
+
+
+/* =========================
+   DATE FUNCTIONS
+========================= */
+
+function todayISO(){
+
+  const d=new Date();
+
+  const local=new Date(
+    d.getTime()-d.getTimezoneOffset()*60000
+  );
+
+  return local.toISOString().slice(0,10);
+
 }
 
-header{
-  background:#0f766e;
-  color:white;
-  padding:18px 16px;
-  position:sticky;
-  top:0;
-  z-index:5;
-  box-shadow:0 2px 8px #0002
+
+function monthISO(){
+
+  return todayISO().slice(0,7);
+
 }
 
-header h1{margin:0;font-size:24px}
-header p{margin:5px 0 0;font-size:14px;opacity:.9}
 
-nav{
-  display:flex;
-  gap:8px;
-  overflow:auto;
-  padding:10px;
-  background:white;
-  border-bottom:1px solid #ddd;
-  position:sticky;
-  top:76px;
-  z-index:4
+/* =========================
+   NUMBER FORMAT
+========================= */
+
+function money(n){
+
+  return Number(n||0).toLocaleString(
+    "en-US",
+    {
+      maximumFractionDigits:0
+    }
+  );
+
 }
 
-nav button{
-  white-space:nowrap;
-  border:0;
-  background:#e7eeee;
-  padding:10px 14px;
-  border-radius:10px;
-  font-weight:600;
-  color:#174b47
+
+function fmtNum(n){
+
+  return Number(n||0).toLocaleString(
+    "en-US",
+    {
+      maximumFractionDigits:2
+    }
+  );
+
 }
 
-nav button.active{
-  background:#0f766e;
-  color:white
+
+/* =========================
+   DATABASE LOAD / SAVE
+========================= */
+
+function loadDB(){
+
+  try{
+
+    const saved=localStorage.getItem(KEY);
+
+    if(saved){
+
+      const parsed=JSON.parse(saved);
+
+      db=Object.assign(db,parsed);
+
+    }
+
+  }catch(e){
+
+    console.error(e);
+
+  }
+
+
+  if(!db.meters)
+    db.meters=[];
+
+  if(!db.rates)
+    db.rates=[];
+
+  if(!db.readings)
+    db.readings=[];
+
+  if(!db.vat)
+    db.vat=[];
+
+  if(!db.charges)
+    db.charges={};
+
+  if(
+    db.charges.energy===undefined ||
+    db.charges.energy===null
+  )
+    db.charges.energy=42;
+
+  if(
+    db.charges.rent===undefined ||
+    db.charges.rent===null
+  )
+    db.charges.rent=10;
+
 }
 
-main{
-  max-width:850px;
-  margin:auto;
-  padding:14px
+
+function saveDB(){
+
+  localStorage.setItem(
+    KEY,
+    JSON.stringify(db)
+  );
+
 }
 
-.page{display:none}
-.page.active{display:block}
 
-.card{
-  background:white;
-  border-radius:16px;
-  padding:16px;
-  margin-bottom:14px;
-  box-shadow:0 2px 10px #00000010
+/* =========================
+   BASIC HELPERS
+========================= */
+
+function meter(id){
+
+  return db.meters.find(
+    m=>m.id===id
+  );
+
 }
 
-.card h2,.card h3{margin:0 0 12px}
 
-.grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px
+function readingsFor(id){
+
+  return db.readings
+    .filter(r=>r.meterId===id)
+    .sort(
+      (a,b)=>
+        a.date.localeCompare(b.date) ||
+        a.createdAt-b.createdAt
+    );
+
 }
 
-@media(max-width:600px){
-  .grid{grid-template-columns:1fr}
+
+function getOpening(m){
+
+  return Number(m?.opening)||0;
+
 }
 
-label{
-  display:block;
-  font-weight:600;
-  margin-bottom:6px
+
+/* =========================
+   RATE BILL
+========================= */
+
+function billForUnits(units){
+
+  units=Math.max(
+    0,
+    Number(units)||0
+  );
+
+  let remaining=units;
+  let total=0;
+
+  const sorted=[
+    ...db.rates
+  ].sort(
+    (a,b)=>
+      Number(a.from)-Number(b.from)
+  );
+
+
+  for(const r of sorted){
+
+    if(remaining<=0)
+      break;
+
+    const from=Number(r.from);
+    const to=Number(r.to);
+    const rate=Number(r.rate);
+
+    if(
+      to<from ||
+      rate<0
+    )
+      continue;
+
+    const capacity=
+      to===999999999
+      ? Infinity
+      : to-from+1;
+
+    const use=Math.min(
+      remaining,
+      capacity
+    );
+
+    if(use>0){
+
+      total+=use*rate;
+
+      remaining-=use;
+
+    }
+
+  }
+
+
+  if(
+    remaining>0 &&
+    sorted.length
+  ){
+
+    const last=
+      sorted[sorted.length-1];
+
+    total+=
+      remaining*
+      Number(last.rate);
+
+  }
+
+
+  return total;
+
 }
 
-input,select{
-  width:100%;
-  padding:12px;
-  border:1px solid #cbd5d5;
-  border-radius:10px;
-  font-size:16px;
-  background:white
+
+/* =========================
+   VAT
+========================= */
+
+function vatKey(meterId,month){
+
+  return meterId+"_"+month;
+
 }
 
-button{
-  font-size:16px;
-  cursor:pointer
+
+function getVAT(meterId,month){
+
+  const item=db.vat.find(
+    x=>
+      x.meterId===meterId &&
+      x.month===month
+  );
+
+  return item
+    ? Number(item.amount)||0
+    : 0;
+
 }
 
-.primary{
-  background:#0f766e;
-  color:white;
-  border:0;
-  border-radius:10px;
-  padding:12px 16px;
-  font-weight:700
+
+/* =========================
+   MONTH LIST
+========================= */
+
+function monthsBetween(startDate,endDate){
+
+  const result=[];
+
+  if(!startDate || !endDate)
+    return result;
+
+  const start=new Date(
+    startDate+"T00:00:00"
+  );
+
+  const end=new Date(
+    endDate+"T00:00:00"
+  );
+
+  let y=start.getFullYear();
+  let m=start.getMonth();
+
+  const ey=end.getFullYear();
+  const em=end.getMonth();
+
+
+  while(
+    y<ey ||
+    (y===ey && m<=em)
+  ){
+
+    result.push(
+      y+
+      "-"+
+      String(m+1).padStart(2,"0")
+    );
+
+    m++;
+
+    if(m>11){
+
+      m=0;
+      y++;
+
+    }
+
+  }
+
+  return result;
+
 }
 
-.secondary{
-  background:#e6eeee;
-  color:#174b47;
-  border:0;
-  border-radius:10px;
-  padding:12px 16px;
-  font-weight:700
+
+/* =========================
+   MONTHS WITH READING
+========================= */
+
+function monthsUsedByMeter(id){
+
+  const arr=readingsFor(id);
+
+  const set=new Set();
+
+  arr.forEach(
+    r=>set.add(r.date.slice(0,7))
+  );
+
+  return [...set].sort();
+
 }
 
-.danger{
-  background:#b91c1c;
-  color:white;
-  border:0;
-  border-radius:10px;
-  padding:10px 14px
+
+/* =========================
+   FIXED CHARGE
+========================= */
+
+function fixedCharge(){
+
+  return (
+    Number(db.charges.energy)||0
+  )+
+  (
+    Number(db.charges.rent)||0
+  );
+
 }
 
-.actions{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-top:12px
+
+function fixedChargeForMeter(id,date){
+
+  if(!date)
+    return 0;
+
+  const months=
+    monthsUsedByMeter(id);
+
+  const month=
+    date.slice(0,7);
+
+  if(
+    months.includes(month)
+  ){
+
+    return fixedCharge();
+
+  }
+
+  return 0;
+
 }
 
-.meter-title{
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  align-items:center
+
+/* =========================
+   CUMULATIVE BILL
+========================= */
+
+function calculateMeterBill(id,date){
+
+  const m=meter(id);
+
+  if(!m)
+    return {
+      units:0,
+      unitBill:0,
+      fixed:0,
+      vat:0,
+      actual:0
+    };
+
+
+  const arr=
+    readingsFor(id)
+      .filter(
+        r=>r.date<=date
+      );
+
+
+  if(!arr.length){
+
+    return {
+      units:0,
+      unitBill:0,
+      fixed:0,
+      vat:0,
+      actual:0
+    };
+
+  }
+
+
+  const last=
+    arr[arr.length-1];
+
+
+  const units=Math.max(
+    0,
+    Number(last.reading)-
+    getOpening(m)
+  );
+
+
+  const unitBill=
+    billForUnits(units);
+
+
+  const months=
+    monthsUsedByMeter(id)
+      .filter(
+        x=>x<=date.slice(0,7)
+      );
+
+
+  const fixed=
+    months.length*
+    fixedCharge();
+
+
+  let vat=0;
+
+  months.forEach(
+    month=>{
+      vat+=getVAT(
+        id,
+        month
+      );
+    }
+  );
+
+
+  const actual=
+    unitBill+
+    fixed+
+    vat;
+
+
+  return {
+    units,
+    unitBill,
+    fixed,
+    vat,
+    actual
+  };
+
 }
 
-.badge{
-  background:#e7f5f2;
-  color:#0f766e;
-  padding:5px 9px;
-  border-radius:999px;
-  font-size:13px;
-  font-weight:700
+
+/* =========================
+   DAILY UNIT
+========================= */
+
+function dailyUnit(id,date){
+
+  const arr=
+    readingsFor(id)
+      .filter(
+        r=>r.date<=date
+      );
+
+  if(!arr.length)
+    return 0;
+
+  const i=
+    arr.findIndex(
+      r=>r.date===date
+    );
+
+  if(i<0)
+    return 0;
+
+  const prev=
+    i===0
+    ? getOpening(meter(id))
+    : Number(arr[i-1].reading);
+
+  return Math.max(
+    0,
+    Number(arr[i].reading)-prev
+  );
+
 }
 
-.stats{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:8px
+
+/* =========================
+   LATEST
+========================= */
+
+function latest(id){
+
+  const arr=
+    readingsFor(id);
+
+  return arr.length
+    ? arr[arr.length-1]
+    : null;
+
 }
 
-@media(max-width:600px){
-  .stats{grid-template-columns:1fr 1fr}
+
+/* =========================
+   SELECT BOXES
+========================= */
+
+function populateMeterSelects(){
+
+  const html=
+    db.meters.map(
+      m=>
+        `<option value="${m.id}">
+          ${esc(m.name)}
+          ${m.number
+            ?" — "+esc(m.number)
+            :""
+          }
+        </option>`
+    ).join("");
+
+
+  document.getElementById(
+    "readingMeter"
+  ).innerHTML=html;
+
+
+  document.getElementById(
+    "historyMeter"
+  ).innerHTML=html;
+
+
+  document.getElementById(
+    "vatMeter"
+  ).innerHTML=html;
+
 }
 
-.stat{
-  background:#f1f6f6;
-  border-radius:12px;
-  padding:12px
+
+/* =========================
+   DASHBOARD
+========================= */
+
+function renderDashboard(){
+
+  const box=
+    document.getElementById(
+      "dashboardMeters"
+    );
+
+
+  box.innerHTML=
+    db.meters.map(
+      m=>{
+
+        const last=
+          latest(m.id);
+
+        const data=
+          last
+          ? calculateMeterBill(
+              m.id,
+              last.date
+            )
+          : {
+              units:0,
+              unitBill:0,
+              fixed:0,
+              vat:0,
+              actual:0
+            };
+
+
+        const todayUnit=
+          last &&
+          last.date===todayISO()
+          ? dailyUnit(
+              m.id,
+              last.date
+            )
+          : 0;
+
+
+        return `
+
+        <div
+          class="card"
+          style="
+            background:#f8fbfb;
+            margin:10px 0 0;
+            box-shadow:none;
+            border:1px solid #e2eeee
+          "
+        >
+
+          <div class="meter-title">
+
+            <h3>
+              ${esc(m.name)}
+            </h3>
+
+            <span class="badge">
+              ${
+                esc(
+                  m.number ||
+                  "মিটার নম্বর নেই"
+                )
+              }
+            </span>
+
+          </div>
+
+
+          <div class="stats">
+
+            <div class="stat">
+              <small>Opening Reading</small>
+              <strong>
+                ${fmtNum(m.opening)}
+              </strong>
+            </div>
+
+
+            <div class="stat">
+              <small>বর্তমান Reading</small>
+              <strong>
+                ${
+                  last
+                  ? fmtNum(last.reading)
+                  : fmtNum(m.opening)
+                }
+              </strong>
+            </div>
+
+
+            <div class="stat">
+              <small>ব্যবহৃত Unit</small>
+              <strong>
+                ${fmtNum(data.units)}
+              </strong>
+            </div>
+
+
+            <div class="stat">
+              <small>আজকের Unit</small>
+              <strong>
+                ${fmtNum(todayUnit)}
+              </strong>
+            </div>
+
+
+            <div class="stat">
+              <small>Unit Bill</small>
+              <strong>
+                ${money(data.unitBill)}
+              </strong>
+            </div>
+
+
+            <div class="stat">
+              <small>Energy Charge</small>
+              <strong>
+                ${money(
+                  data.fixed
+                  ? db.charges.energy
+                  : 0
+                )}
+              </strong>
+            </div>
+
+
+            <div class="stat">
+              <small>Meter Rent</small>
+              <strong>
+                ${money(
+                  data.fixed
+                  ? db.charges.rent
+                  : 0
+                )}
+              </strong>
+            </div>
+
+
+            <div class="stat">
+              <small>VAT</small>
+              <strong>
+                ${money(data.vat)}
+              </strong>
+            </div>
+
+
+            <div class="stat">
+              <small>Actual Bill</small>
+              <strong>
+                ${money(data.actual)}
+              </strong>
+            </div>
+
+
+            <div class="stat">
+              <small>শেষ তারিখ</small>
+              <strong
+                style="font-size:16px"
+              >
+                ${
+                  last
+                  ? formatDate(last.date)
+                  : "-"
+                }
+              </strong>
+            </div>
+
+          </div>
+
+        </div>
+
+        `;
+
+      }
+    ).join("");
+
+
+  let totalUnits=0;
+  let totalUnitBill=0;
+  let totalFixed=0;
+  let totalVat=0;
+  let totalBill=0;
+  let lastDate="";
+
+
+  db.meters.forEach(
+    m=>{
+
+      const l=
+        latest(m.id);
+
+      if(l){
+
+        const data=
+          calculateMeterBill(
+            m.id,
+            l.date
+          );
+
+
+        totalUnits+=data.units;
+        totalUnitBill+=data.unitBill;
+        totalFixed+=data.fixed;
+        totalVat+=data.vat;
+        totalBill+=data.actual;
+
+
+        if(
+          l.date>lastDate
+        )
+          lastDate=l.date;
+
+      }
+
+    }
+  );
+
+
+  document.getElementById(
+    "totalUnits"
+  ).textContent=
+    fmtNum(totalUnits);
+
+
+  document.getElementById(
+    "totalUnitBill"
+  ).textContent=
+    money(totalUnitBill);
+
+
+  document.getElementById(
+    "totalFixed"
+  ).textContent=
+    money(totalFixed);
+
+
+  document.getElementById(
+    "totalVat"
+  ).textContent=
+    money(totalVat);
+
+
+  document.getElementById(
+    "totalBill"
+  ).textContent=
+    money(totalBill);
+
+
+  document.getElementById(
+    "lastUpdate"
+  ).textContent=
+    lastDate
+    ? formatDate(lastDate)
+    : "-";
+
 }
 
-.stat small{
-  display:block;
-  color:#667;
-  margin-bottom:4px
+
+/* =========================
+   READING PREVIEW
+========================= */
+
+function renderPreview(){
+
+  const id=
+    document.getElementById(
+      "readingMeter"
+    ).value;
+
+
+  const m=
+    meter(id);
+
+  const last=
+    latest(id);
+
+
+  if(!m){
+
+    document.getElementById(
+      "readingPreview"
+    ).innerHTML="";
+
+    return;
+
+  }
+
+
+  const current=
+    last
+    ? Number(last.reading)
+    : Number(m.opening);
+
+
+  const units=
+    last
+    ? Math.max(
+        0,
+        current-
+        Number(m.opening)
+      )
+    : 0;
+
+
+  const data=
+    last
+    ? calculateMeterBill(
+        id,
+        last.date
+      )
+    : {
+        unitBill:0,
+        fixed:0,
+        vat:0,
+        actual:0
+      };
+
+
+  document.getElementById(
+    "readingPreview"
+  ).innerHTML=`
+
+    <div class="stats">
+
+      <div class="stat">
+        <small>Opening</small>
+        <strong>
+          ${fmtNum(m.opening)}
+        </strong>
+      </div>
+
+
+      <div class="stat">
+        <small>Previous</small>
+        <strong>
+          ${fmtNum(current)}
+        </strong>
+      </div>
+
+
+      <div class="stat">
+        <small>Total Unit</small>
+        <strong>
+          ${fmtNum(units)}
+        </strong>
+      </div>
+
+
+      <div class="stat">
+        <small>Unit Bill</small>
+        <strong>
+          ${money(data.unitBill)}
+        </strong>
+      </div>
+
+
+      <div class="stat">
+        <small>Fixed Charge</small>
+        <strong>
+          ${money(data.fixed)}
+        </strong>
+      </div>
+
+
+      <div class="stat">
+        <small>VAT</small>
+        <strong>
+          ${money(data.vat)}
+        </strong>
+      </div>
+
+
+      <div class="stat">
+        <small>Actual Bill</small>
+        <strong>
+          ${money(data.actual)}
+        </strong>
+      </div>
+
+    </div>
+
+  `;
+
 }
 
-.stat strong{font-size:20px}
 
-table{
-  width:100%;
-  border-collapse:collapse;
-  font-size:14px
+/* =========================
+   LATEST READING
+========================= */
+
+function loadLatestReading(){
+
+  const id=
+    document.getElementById(
+      "readingMeter"
+    ).value;
+
+
+  const l=
+    latest(id);
+
+
+  document.getElementById(
+    "currentReading"
+  ).value=
+    l
+    ? l.reading
+    : "";
+
+
+  renderPreview();
+
 }
 
-th,td{
-  border-bottom:1px solid #e2e8e8;
-  padding:9px 6px;
-  text-align:left
+
+/* =========================
+   SAVE READING
+========================= */
+
+function saveReading(){
+
+  const id=
+    document.getElementById(
+      "readingMeter"
+    ).value;
+
+
+  const date=
+    document.getElementById(
+      "readingDate"
+    ).value;
+
+
+  const value=
+    Number(
+      document.getElementById(
+        "currentReading"
+      ).value
+    );
+
+
+  const msg=
+    document.getElementById(
+      "readingMessage"
+    );
+
+
+  const m=
+    meter(id);
+
+
+  if(
+    !date ||
+    !Number.isFinite(value) ||
+    value<0
+  ){
+
+    msg.className="error";
+
+    msg.textContent=
+      "তারিখ ও সঠিক Reading দিন।";
+
+    return;
+
+  }
+
+
+  const prevArr=
+    readingsFor(id)
+      .filter(
+        r=>r.date<date
+      );
+
+
+  const prev=
+    prevArr.length
+    ? Number(
+        prevArr[
+          prevArr.length-1
+        ].reading
+      )
+    : Number(m.opening);
+
+
+  if(value<prev){
+
+    msg.className="error";
+
+    msg.textContent=
+      `Reading আগের Reading (${fmtNum(prev)})-এর চেয়ে কম হতে পারবে না।`;
+
+    return;
+
+  }
+
+
+  const same=
+    db.readings.find(
+      r=>
+        r.meterId===id &&
+        r.date===date
+    );
+
+
+  if(same){
+
+    same.reading=value;
+    same.createdAt=Date.now();
+
+  }else{
+
+    db.readings.push({
+
+      id:
+        "R"+Date.now(),
+
+      meterId:id,
+
+      date,
+
+      reading:value,
+
+      createdAt:Date.now()
+
+    });
+
+  }
+
+
+  saveDB();
+
+  renderAll();
+
+
+  const du=
+    value-prev;
+
+
+  const data=
+    calculateMeterBill(
+      id,
+      date
+    );
+
+
+  msg.className="success";
+
+  msg.textContent=
+    `Saved! আজকের ব্যবহার ${fmtNum(du)} ইউনিট। `+
+    `মোট ${fmtNum(data.units)} ইউনিট। `+
+    `Unit Bill ${money(data.unitBill)}, `+
+    `Fixed ${money(data.fixed)}, `+
+    `VAT ${money(data.vat)}, `+
+    `Actual Bill ${money(data.actual)}।`;
+
 }
 
-th{background:#eef4f4}
 
-.table-wrap{overflow:auto}
+/* =========================
+   HISTORY
+========================= */
 
-.notice{
-  background:#fff8e1;
-  border-left:4px solid #e0a800;
-  padding:12px;
-  border-radius:8px;
-  margin-bottom:12px
+function renderHistory(){
+
+  const id=
+    document.getElementById(
+      "historyMeter"
+    ).value;
+
+
+  const month=
+    document.getElementById(
+      "historyMonth"
+    ).value;
+
+
+  const arr=
+    readingsFor(id)
+      .filter(
+        r=>
+          !month ||
+          r.date.startsWith(month)
+      );
+
+
+  const body=
+    document.getElementById(
+      "historyBody"
+    );
+
+
+  if(!arr.length){
+
+    body.innerHTML=
+      `<tr>
+        <td colspan="9" class="empty">
+          এই মাসে কোনো Reading নেই।
+        </td>
+      </tr>`;
+
+    return;
+
+  }
+
+
+  body.innerHTML=
+    arr.map(
+      r=>{
+
+        const prevArr=
+          readingsFor(id)
+            .filter(
+              x=>x.date<r.date
+            );
+
+
+        const prev=
+          prevArr.length
+          ? Number(
+              prevArr[
+                prevArr.length-1
+              ].reading
+            )
+          : Number(
+              meter(id).opening
+            );
+
+
+        const du=
+          Math.max(
+            0,
+            Number(r.reading)-prev
+          );
+
+
+        const data=
+          calculateMeterBill(
+            id,
+            r.date
+          );
+
+
+        return `
+
+        <tr>
+
+          <td>
+            ${formatDate(r.date)}
+          </td>
+
+          <td>
+            ${fmtNum(r.reading)}
+          </td>
+
+          <td>
+            ${fmtNum(du)}
+          </td>
+
+          <td>
+            ${fmtNum(data.units)}
+          </td>
+
+          <td>
+            ${money(data.unitBill)}
+          </td>
+
+          <td>
+            ${money(data.fixed)}
+          </td>
+
+          <td>
+            ${money(data.vat)}
+          </td>
+
+          <td>
+            ${money(data.actual)}
+          </td>
+
+          <td>
+
+            <button
+              class="danger"
+              onclick="deleteReading('${r.id}')">
+              Delete
+            </button>
+
+          </td>
+
+        </tr>
+
+        `;
+
+      }
+    ).join("");
+
 }
 
-.success{
-  color:#087443;
-  font-weight:700
+
+/* =========================
+   DELETE READING
+========================= */
+
+function deleteReading(id){
+
+  if(
+    !confirm(
+      "এই Reading মুছে ফেলবেন?"
+    )
+  )
+    return;
+
+
+  db.readings=
+    db.readings.filter(
+      r=>r.id!==id
+    );
+
+
+  saveDB();
+
+  renderAll();
+
 }
 
-.error{
-  color:#b91c1c;
-  font-weight:700
+
+/* =========================
+   LOAD SETTINGS
+========================= */
+
+function loadSettings(){
+
+  const a=db.meters[0];
+  const b=db.meters[1];
+
+
+  if(a){
+
+    m1name.value=a.name;
+    m1number.value=a.number;
+    m1opening.value=a.opening;
+    m1date.value=a.openingDate;
+
+  }
+
+
+  if(b){
+
+    m2name.value=b.name;
+    m2number.value=b.number;
+    m2opening.value=b.opening;
+    m2date.value=b.openingDate;
+
+  }
+
+
+  energyCharge.value=
+    db.charges.energy;
+
+
+  meterRent.value=
+    db.charges.rent;
+
+
+  fixedCharge.value=
+    fixedCharge();
+
+
+  if(
+    !vatMonth.value
+  )
+    vatMonth.value=
+      monthISO();
+
+
+  renderVATTable();
+
+  renderRateRows();
+
 }
 
-.rate-row{
-  display:grid;
-  grid-template-columns:1fr 1fr 1fr auto;
-  gap:8px;
-  align-items:end;
-  margin-bottom:8px
+
+/* =========================
+   SAVE METER SETTINGS
+========================= */
+
+function saveMeterSettings(){
+
+  const vals=[
+
+    {
+      name:
+        m1name.value.trim()||
+        "মিটার–১",
+
+      number:
+        m1number.value.trim(),
+
+      opening:
+        Number(
+          m1opening.value
+        )||0,
+
+      openingDate:
+        m1date.value||
+        todayISO()
+    },
+
+
+    {
+      name:
+        m2name.value.trim()||
+        "মিটার–২",
+
+      number:
+        m2number.value.trim(),
+
+      opening:
+        Number(
+          m2opening.value
+        )||0,
+
+      openingDate:
+        m2date.value||
+        todayISO()
+    }
+
+  ];
+
+
+  db.meters[0]=
+    Object.assign(
+      db.meters[0],
+      vals[0]
+    );
+
+
+  db.meters[1]=
+    Object.assign(
+      db.meters[1],
+      vals[1]
+    );
+
+
+  saveDB();
+
+  renderAll();
+
+
+  meterMessage.className=
+    "success";
+
+
+  meterMessage.textContent=
+    "Meter Settings সংরক্ষণ হয়েছে।";
+
 }
 
-@media(max-width:600px){
-  .rate-row{grid-template-columns:1fr 1fr}
-  .rate-row button{grid-column:1/-1}
+
+/* =========================
+   FIXED SETTINGS
+========================= */
+
+function updateFixedPreview(){
+
+  const energy=
+    Number(
+      document.getElementById(
+        "energyCharge"
+      ).value
+    )||0;
+
+
+  const rent=
+    Number(
+      document.getElementById(
+        "meterRent"
+      ).value
+    )||0;
+
+
+  document.getElementById(
+    "fixedCharge"
+  ).value=
+    energy+rent;
+
 }
 
-.empty{
-  text-align:center;
-  color:#777;
-  padding:25px 10px
+
+document.getElementById(
+  "energyCharge"
+).addEventListener(
+  "input",
+  updateFixedPreview
+);
+
+
+document.getElementById(
+  "meterRent"
+).addEventListener(
+  "input",
+  updateFixedPreview
+);
+
+
+function saveFixedSettings(){
+
+  db.charges.energy=
+    Number(
+      energyCharge.value
+    )||0;
+
+
+  db.charges.rent=
+    Number(
+      meterRent.value
+    )||0;
+
+
+  saveDB();
+
+  renderAll();
+
+
+  fixedMessage.className=
+    "success";
+
+
+  fixedMessage.textContent=
+    `Fixed Charge সংরক্ষণ হয়েছে। মোট ${money(fixedCharge())}।`;
+
 }
 
-footer{
-  text-align:center;
-  color:#777;
-  font-size:13px;
-  padding:20px
+
+/* =========================
+   VAT SAVE
+========================= */
+
+function saveVAT(){
+
+  const meterId=
+    document.getElementById(
+      "vatMeter"
+    ).value;
+
+
+  const month=
+    document.getElementById(
+      "vatMonth"
+    ).value;
+
+
+  const amount=
+    Number(
+      document.getElementById(
+        "vatAmount"
+      ).value
+    )||0;
+
+
+  const msg=
+    document.getElementById(
+      "vatMessage"
+    );
+
+
+  if(!meterId || !month){
+
+    msg.className="error";
+
+    msg.textContent=
+      "মিটার ও মাস নির্বাচন করুন।";
+
+    return;
+
+  }
+
+
+  const same=
+    db.vat.find(
+      x=>
+        x.meterId===meterId &&
+        x.month===month
+    );
+
+
+  if(same){
+
+    same.amount=amount;
+
+  }else{
+
+    db.vat.push({
+
+      meterId,
+      month,
+      amount
+
+    });
+
+  }
+
+
+  saveDB();
+
+  renderAll();
+
+
+  msg.className="success";
+
+  msg.textContent=
+    `VAT ${money(amount)} সংরক্ষণ হয়েছে।`;
+
 }
 
-.section-title{
-  margin-top:20px;
-  padding-top:15px;
-  border-top:1px solid #e2e8e8
+
+/* =========================
+   VAT TABLE
+========================= */
+
+function renderVATTable(){
+
+  const body=
+    document.getElementById(
+      "vatBody"
+    );
+
+
+  if(!db.vat.length){
+
+    body.innerHTML=
+      `<tr>
+        <td colspan="4" class="empty">
+          কোনো VAT দেওয়া হয়নি।
+        </td>
+      </tr>`;
+
+    return;
+
+  }
+
+
+  body.innerHTML=
+    db.vat
+      .slice()
+      .sort(
+        (a,b)=>
+          b.month.localeCompare(
+            a.month
+          )
+      )
+      .map(
+        (v,i)=>{
+
+          const m=
+            meter(v.meterId);
+
+
+          return `
+
+          <tr>
+
+            <td>
+              ${v.month}
+            </td>
+
+            <td>
+              ${esc(
+                m
+                ? m.name
+                : "মিটার"
+              )}
+            </td>
+
+            <td>
+              ${money(v.amount)}
+            </td>
+
+            <td>
+
+              <button
+                class="danger"
+                onclick="deleteVAT('${v.meterId}','${v.month}')">
+                Delete
+              </button>
+
+            </td>
+
+          </tr>
+
+          `;
+
+        }
+      ).join("");
+
 }
-</style>
+
+
+/* =========================
+   DELETE VAT
+========================= */
+
+function deleteVAT(
+  meterId,
+  month
+){
+
+  if(
+    !confirm(
+      "এই VAT তথ্য মুছে ফেলবেন?"
+    )
+  )
+    return;
+
+
+  db.vat=
+    db.vat.filter(
+      x=>
+        !(
+          x.meterId===meterId &&
+          x.month===month
+        )
+    );
+
+
+  saveDB();
+
+  renderAll();
+
+}
+
+
+/* =========================
+   RATE SETTINGS
+========================= */
+
+function renderRateRows(){
+
+  rateRows.innerHTML=
+    db.rates.map(
+      (r,i)=>
+      `<div class="rate-row">
+
+        <div>
+          <label>From</label>
+
+          <input
+            type="number"
+            data-rate="${i}"
+            data-field="from"
+            value="${r.from}"
+            min="0">
+        </div>
+
+
+        <div>
+          <label>To</label>
+
+          <input
+            type="number"
+            data-rate="${i}"
+            data-field="to"
+            value="${r.to}"
+            min="0">
+        </div>
+
+
+        <div>
+          <label>Rate</label>
+
+          <input
+            type="number"
+            data-rate="${i}"
+            data-field="rate"
+            value="${r.rate}"
+            min="0"
+            step="0.01">
+        </div>
+
+
+        <button
+          class="danger"
+          onclick="removeRateRow(${i})">
+          Remove
+        </button>
+
+      </div>`
+    ).join("");
+
+}
+
+
+function addRateRow(){
+
+  const last=
+    db.rates[
+      db.rates.length-1
+    ];
+
+
+  const from=
+    last
+    ? Number(last.to)+1
+    : 0;
+
+
+  db.rates.push({
+
+    from,
+
+    to:
+      from+24,
+
+    rate:0
+
+  });
+
+
+  renderRateRows();
+
+}
+
+
+function removeRateRow(i){
+
+  db.rates.splice(i,1);
+
+  renderRateRows();
+
+}
+
+
+function saveRates(){
+
+  document
+    .querySelectorAll(
+      "[data-rate]"
+    )
+    .forEach(
+      el=>{
+
+        const i=
+          Number(
+            el.dataset.rate
+          );
+
+
+        const f=
+          el.dataset.field;
+
+
+        db.rates[i][f]=
+          Number(el.value)||0;
+
+      }
+    );
+
+
+  db.rates.sort(
+    (a,b)=>
+      a.from-b.from
+  );
+
+
+  saveDB();
+
+  renderAll();
+
+
+  rateMessage.className=
+    "success";
+
+
+  rateMessage.textContent=
+    "Rate Settings সংরক্ষণ হয়েছে।";
+
+}
+
+
+/* =========================
+   BACKUP
+========================= */
+
+function backupData(){
+
+  const backup={
+
+    app:
+      "Current Bill Tracker",
+
+    version:2,
+
+    exportedAt:
+      new Date().toISOString(),
+
+    data:db
+
+  };
+
+
+  const blob=
+    new Blob(
+      [
+        JSON.stringify(
+          backup,
+          null,
+          2
+        )
+      ],
+      {
+        type:
+          "application/json"
+      }
+    );
+
+
+  const url=
+    URL.createObjectURL(
+      blob
+    );
+
+
+  const a=
+    document.createElement(
+      "a"
+    );
+
+
+  a.href=url;
+
+
+  a.download=
+    "current-bill-tracker-backup-"+
+    todayISO()+
+    ".json";
+
+
+  a.click();
+
+
+  URL.revokeObjectURL(url);
+
+
+  backupMessage.className=
+    "success";
+
+
+  backupMessage.textContent=
+    "Backup ফাইল তৈরি হয়েছে।";
+
+}
+
+
+/* =========================
+   RESTORE
+========================= */
+
+function restoreData(e){
+
+  const file=
+    e.target.files[0];
+
+
+  if(!file)
+    return;
+
+
+  const reader=
+    new FileReader();
+
+
+  reader.onload=()=>{
+
+    try{
+
+      const x=
+        JSON.parse(
+          reader.result
+        );
+
+
+      const d=
+        x.data||x;
+
+
+      if(
+        !d.meters ||
+        !d.rates ||
+        !d.readings
+      )
+        throw new Error(
+          "Invalid"
+        );
+
+
+      db=d;
+
+
+      if(!db.vat)
+        db.vat=[];
+
+
+      if(!db.charges)
+        db.charges={
+          energy:42,
+          rent:10
+        };
+
+
+      if(
+        db.charges.energy===undefined
+      )
+        db.charges.energy=42;
+
+
+      if(
+        db.charges.rent===undefined
+      )
+        db.charges.rent=10;
+
+
+      saveDB();
+
+      renderAll();
+
+
+      backupMessage.className=
+        "success";
+
+
+      backupMessage.textContent=
+        "Backup সফলভাবে Restore হয়েছে।";
+
+    }catch(err){
+
+      backupMessage.className=
+        "error";
+
+
+      backupMessage.textContent=
+        "Backup ফাইলটি সঠিক নয়।";
+
+    }
+
+  };
+
+
+  reader.readAsText(file);
+
+}
+
+
+/* =========================
+   RENDER ALL
+========================= */
+
+function renderAll(){
+
+  populateMeterSelects();
+
+  renderDashboard();
+
+  renderPreview();
+
+  renderHistory();
+
+  loadSettings();
+
+}
+
+
+/* =========================
+   DATE FORMAT
+========================= */
+
+function formatDate(s){
+
+  if(!s)
+    return "-";
+
+
+  const [
+    y,
+    m,
+    d
+  ]=
+    s.split("-");
+
+
+  return d+
+    "-"+
+    m+
+    "-"+
+    y;
+
+}
+
+
+/* =========================
+   HTML ESCAPE
+========================= */
+
+function esc(s){
+
+  return String(
+    s??""
+  ).replace(
+    /[&<>"']/g,
+    c=>
+      ({
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#39;"
+      }[c])
+  );
+
+}
+
+
+/* =========================
+   TAB SYSTEM
+========================= */
+
+document
+  .querySelectorAll(
+    ".tab"
+  )
+  .forEach(
+    btn=>
+      btn.addEventListener(
+        "click",
+        ()=>{
+
+          document
+            .querySelectorAll(
+              ".tab"
+            )
+            .forEach(
+              x=>
+                x.classList.remove(
+                  "active"
+                )
+            );
+
+
+          document
+            .querySelectorAll(
+              ".page"
+            )
+            .forEach(
+              x=>
+                x.classList.remove(
+                  "active"
+                )
+            );
+
+
+          btn.classList.add(
+            "active"
+          );
+
+
+          document
+            .getElementById(
+              btn.dataset.page
+            )
+            .classList.add(
+              "active"
+            );
+
+
+          if(
+            btn.dataset.page===
+            "history"
+          )
+            renderHistory();
+
+
+          if(
+            btn.dataset.page===
+            "settings"
+          )
+            loadSettings();
+
+        }
+      )
+  );
+
+
+/* =========================
+   EVENTS
+========================= */
+
+document
+  .getElementById(
+    "readingMeter"
+  )
+  .addEventListener(
+    "change",
+    renderPreview
+  );
+
+
+document
+  .getElementById(
+    "readingDate"
+  )
+  .addEventListener(
+    "change",
+    renderPreview
+  );
+
+
+/* =========================
+   INITIALIZE
+========================= */
+
+loadDB();
+
+
+if(
+  db.meters.length<2
+){
+
+  while(
+    db.meters.length<2
+  ){
+
+    db.meters.push({
+
+      id:
+        "m"+
+        (db.meters.length+1),
+
+      name:
+        "মিটার–"+
+        (db.meters.length+1),
+
+      number:"",
+
+      opening:0,
+
+      openingDate:
+        todayISO()
+
+    });
+
+  }
+
+}
+
+
+document.getElementById(
+  "readingDate"
+).value=
+  todayISO();
+
+
+document.getElementById(
+  "historyMonth"
+).value=
+  monthISO();
+
+
+document.getElementById(
+  "vatMonth"
+).value=
+  monthISO();
+
+
+renderAll();
+
+</script>
