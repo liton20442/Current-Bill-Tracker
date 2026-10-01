@@ -1,9 +1,14 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0,
+      viewport-fit=cover">
+
 <meta name="theme-color" content="#0f766e">
+
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Current Bill Tracker">
@@ -11,4373 +16,4708 @@
 <title>Current Bill Tracker</title>
 
 <style>
-*{box-sizing:border-box}
+
+*{
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+}
+
+html{
+    font-size:18px;
+}
 
 body{
-  margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
-  background:#f4f7f8;
-  color:#17202a;
-  font-size:16px;
+    margin:0;
+    padding:0;
+    background:#f1f5f9;
+    color:#172033;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif;
+    font-size:20px;
+    line-height:1.55;
 }
 
-button,input,select{
-  font:inherit;
+button,
+input,
+select,
+textarea{
+    font-family:inherit;
+    font-size:19px;
 }
 
-header{
-  background:#0f766e;
-  color:white;
-  padding:14px;
-  position:sticky;
-  top:0;
-  z-index:100;
-  box-shadow:0 2px 8px rgba(0,0,0,.15);
+button{
+    cursor:pointer;
+}
+
+.app-header{
+    position:sticky;
+    top:0;
+    z-index:1000;
+    background:#0f766e;
+    color:white;
+    padding:
+        calc(14px + env(safe-area-inset-top))
+        16px
+        14px;
+    box-shadow:0 3px 12px rgba(0,0,0,.18);
 }
 
 .header-row{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
+    max-width:1100px;
+    margin:auto;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
 }
 
-h1{
-  margin:0;
-  font-size:21px;
+.app-title{
+    margin:0;
+    font-size:27px;
+    line-height:1.2;
+    font-weight:800;
 }
 
-.header-small{
-  font-size:12px;
-  opacity:.9;
-  margin-top:3px;
+.app-subtitle{
+    margin:4px 0 0;
+    font-size:16px;
+    opacity:.92;
 }
 
-nav{
-  display:flex;
-  gap:6px;
-  overflow-x:auto;
-  margin-top:12px;
+.menu-button{
+    width:52px;
+    height:52px;
+    border:0;
+    border-radius:12px;
+    background:rgba(255,255,255,.16);
+    color:white;
+    font-size:28px;
+    font-weight:bold;
 }
 
-nav button{
-  border:0;
-  border-radius:8px;
-  padding:9px 12px;
-  background:rgba(255,255,255,.16);
-  color:white;
-  white-space:nowrap;
+.nav{
+    max-width:1100px;
+    margin:10px auto 0;
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    padding-bottom:2px;
+    scrollbar-width:none;
 }
 
-nav button.active{
-  background:white;
-  color:#0f766e;
-  font-weight:bold;
+.nav::-webkit-scrollbar{
+    display:none;
 }
 
-main{
-  max-width:1100px;
-  margin:auto;
-  padding:14px;
+.nav button{
+    flex:0 0 auto;
+    border:0;
+    border-radius:12px;
+    background:rgba(255,255,255,.13);
+    color:white;
+    padding:12px 16px;
+    font-size:17px;
+    font-weight:700;
+    min-height:48px;
+}
+
+.nav button.active{
+    background:white;
+    color:#0f766e;
+}
+
+.container{
+    max-width:1100px;
+    margin:0 auto;
+    padding:18px 14px 80px;
 }
 
 .page{
-  display:none;
+    display:none;
 }
 
 .page.active{
-  display:block;
+    display:block;
 }
 
 .card{
-  background:white;
-  border-radius:12px;
-  padding:15px;
-  margin-bottom:14px;
-  box-shadow:0 1px 5px rgba(0,0,0,.08);
+    background:white;
+    border-radius:16px;
+    padding:20px;
+    margin-bottom:18px;
+    box-shadow:
+        0 3px 12px rgba(15,23,42,.08);
+    border:1px solid #e2e8f0;
 }
 
-.card h2,
-.card h3{
-  margin:0 0 12px;
+.card-title{
+    margin:0 0 15px;
+    font-size:24px;
+    font-weight:800;
+    color:#0f172a;
 }
 
-.grid{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:12px;
-}
-
-label{
-  display:block;
-  font-weight:600;
-  margin-bottom:5px;
-}
-
-input,
-select{
-  width:100%;
-  border:1px solid #cbd5d8;
-  border-radius:8px;
-  padding:10px;
-  background:white;
-}
-
-button.primary{
-  background:#0f766e;
-  color:white;
-  border:0;
-  border-radius:8px;
-  padding:10px 15px;
-  font-weight:700;
-}
-
-button.secondary{
-  background:#e7eeee;
-  color:#145b56;
-  border:0;
-  border-radius:8px;
-  padding:10px 15px;
-}
-
-button.danger{
-  background:#b91c1c;
-  color:white;
-  border:0;
-  border-radius:8px;
-  padding:9px 12px;
-}
-
-.actions{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-top:12px;
+.section-title{
+    margin:24px 0 12px;
+    font-size:22px;
+    font-weight:800;
+    color:#0f766e;
 }
 
 .note{
-  background:#ecfdf5;
-  border-left:4px solid #0f766e;
-  padding:10px 12px;
-  border-radius:6px;
-  margin-bottom:12px;
+    background:#ecfeff;
+    border-left:5px solid #0f766e;
+    border-radius:10px;
+    padding:13px 15px;
+    font-size:17px;
+    margin:12px 0;
 }
 
-.stat-grid{
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:10px;
+.warning{
+    background:#fff7ed;
+    border-left:5px solid #ea580c;
+    border-radius:10px;
+    padding:13px 15px;
+    font-size:17px;
+    margin:12px 0;
 }
 
-.stat{
-  background:#f8fafb;
-  border:1px solid #e2e8ea;
-  border-radius:10px;
-  padding:12px;
+.success{
+    background:#ecfdf5;
+    border-left:5px solid #059669;
+    border-radius:10px;
+    padding:13px 15px;
+    font-size:17px;
+    margin:12px 0;
 }
 
-.stat-title{
-  font-size:13px;
-  color:#64748b;
+.error{
+    background:#fef2f2;
+    border-left:5px solid #dc2626;
+    border-radius:10px;
+    padding:13px 15px;
+    font-size:17px;
+    margin:12px 0;
+}
+
+.dashboard-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:14px;
+    margin-bottom:18px;
+}
+
+.stat-card{
+    background:white;
+    border-radius:16px;
+    padding:18px;
+    border:1px solid #e2e8f0;
+    box-shadow:0 3px 12px rgba(15,23,42,.07);
+}
+
+.stat-label{
+    font-size:17px;
+    color:#64748b;
+    font-weight:700;
 }
 
 .stat-value{
-  font-size:22px;
-  font-weight:800;
-  margin-top:4px;
+    margin-top:4px;
+    font-size:29px;
+    font-weight:900;
+    color:#0f766e;
+    line-height:1.2;
+}
+
+.meter-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:16px;
 }
 
 .meter-card{
-  border:1px solid #dce5e7;
-  border-radius:11px;
-  padding:13px;
-  margin-top:12px;
+    border:2px solid #cbd5e1;
+    border-radius:16px;
+    background:white;
+    padding:20px;
 }
 
-.meter-title{
-  font-size:18px;
-  font-weight:800;
-  color:#0f766e;
-  margin-bottom:8px;
+.meter-card.meter-one{
+    border-left:7px solid #0f766e;
 }
 
-.money-list{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:8px;
-  margin-top:11px;
+.meter-card.meter-two{
+    border-left:7px solid #2563eb;
 }
 
-.money-item{
-  background:#f8fafb;
-  border-radius:8px;
-  padding:9px;
-  border:1px solid #e5eaec;
+.meter-name{
+    margin:0;
+    font-size:24px;
+    font-weight:900;
 }
 
-.money-label{
-  font-size:13px;
-  color:#64748b;
+.meter-number{
+    margin:3px 0 16px;
+    font-size:17px;
+    color:#64748b;
 }
 
-.money-value{
-  font-weight:800;
-  margin-top:3px;
+.meter-line{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    padding:9px 0;
+    border-bottom:1px solid #e2e8f0;
+}
+
+.meter-line:last-child{
+    border-bottom:0;
+}
+
+.meter-line span:first-child{
+    color:#64748b;
+    font-size:17px;
+}
+
+.meter-line strong{
+    font-size:19px;
+    text-align:right;
+}
+
+.bill-box{
+    background:#f0fdfa;
+    border-radius:13px;
+    padding:14px;
+    margin-top:15px;
+}
+
+.bill-line{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    padding:6px 0;
+    font-size:18px;
+}
+
+.bill-total{
+    border-top:2px solid #99f6e4;
+    margin-top:7px;
+    padding-top:10px;
+    font-size:22px;
+    font-weight:900;
+    color:#0f766e;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:16px;
+}
+
+.form-group{
+    margin-bottom:4px;
+}
+
+.form-group.full{
+    grid-column:1/-1;
+}
+
+label{
+    display:block;
+    font-size:19px;
+    font-weight:800;
+    margin-bottom:7px;
+    color:#334155;
+}
+
+input,
+select,
+textarea{
+    width:100%;
+    min-height:54px;
+    border:2px solid #cbd5e1;
+    border-radius:12px;
+    background:white;
+    padding:12px 14px;
+    color:#111827;
+    outline:none;
+}
+
+textarea{
+    min-height:110px;
+    resize:vertical;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+    border-color:#0f766e;
+    box-shadow:0 0 0 3px rgba(15,118,110,.12);
+}
+
+.button-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:17px;
+}
+
+.btn{
+    min-height:54px;
+    border:0;
+    border-radius:12px;
+    padding:12px 18px;
+    font-size:18px;
+    font-weight:800;
+    background:#0f766e;
+    color:white;
+}
+
+.btn:hover{
+    filter:brightness(.96);
+}
+
+.btn.secondary{
+    background:#475569;
+}
+
+.btn.blue{
+    background:#2563eb;
+}
+
+.btn.green{
+    background:#059669;
+}
+
+.btn.orange{
+    background:#ea580c;
+}
+
+.btn.red{
+    background:#dc2626;
+}
+
+.btn.light{
+    background:#e2e8f0;
+    color:#172033;
+}
+
+.btn.small{
+    min-height:44px;
+    padding:8px 13px;
+    font-size:16px;
+}
+
+.preview{
+    background:#f8fafc;
+    border:2px dashed #94a3b8;
+    border-radius:14px;
+    padding:17px;
+    margin-top:18px;
+}
+
+.preview h3{
+    margin:0 0 12px;
+    font-size:21px;
+}
+
+.preview-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px 16px;
+}
+
+.preview-item{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    padding:6px 0;
+    border-bottom:1px solid #e2e8f0;
+}
+
+.preview-item span{
+    color:#64748b;
+    font-size:17px;
+}
+
+.preview-item strong{
+    font-size:18px;
 }
 
 .table-wrap{
-  overflow:auto;
+    width:100%;
+    overflow-x:auto;
+    border:1px solid #cbd5e1;
+    border-radius:12px;
+    background:white;
 }
 
 table{
-  width:100%;
-  border-collapse:collapse;
-  min-width:900px;
+    width:100%;
+    min-width:950px;
+    border-collapse:collapse;
 }
 
 th,
 td{
-  border:1px solid #d8e0e2;
-  padding:8px;
-  text-align:left;
-  font-size:14px;
+    border-bottom:1px solid #cbd5e1;
+    padding:12px 10px;
+    text-align:left;
+    vertical-align:middle;
+    font-size:17px;
+    white-space:nowrap;
 }
 
 th{
-  background:#eef4f4;
+    background:#f1f5f9;
+    font-weight:900;
+    color:#334155;
+    position:sticky;
+    top:0;
+    z-index:2;
 }
 
-.small{
-  font-size:13px;
-  color:#64748b;
+tr:last-child td{
+    border-bottom:0;
+}
+
+.amount{
+    font-weight:800;
+}
+
+.total-row td{
+    background:#ecfdf5;
+    font-weight:900;
 }
 
 .empty{
-  padding:25px;
-  text-align:center;
-  color:#64748b;
+    text-align:center;
+    padding:28px 15px;
+    color:#64748b;
+    font-size:18px;
 }
 
-.success{
-  color:#047857;
-  font-weight:700;
+.rate-row,
+.vat-row{
+    display:grid;
+    grid-template-columns:1.2fr 1fr 1fr auto;
+    gap:10px;
+    align-items:end;
+    margin-bottom:12px;
 }
 
-.error{
-  color:#b91c1c;
-  font-weight:700;
+.rate-row > div,
+.vat-row > div{
+    min-width:0;
+}
+
+.remove-btn{
+    min-height:52px;
+    border:0;
+    border-radius:11px;
+    padding:10px 13px;
+    background:#fee2e2;
+    color:#b91c1c;
+    font-size:17px;
+    font-weight:800;
+}
+
+.charge-box{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:16px;
+}
+
+.charge-item{
+    background:#f8fafc;
+    border:2px solid #cbd5e1;
+    border-radius:13px;
+    padding:15px;
+}
+
+.charge-item .charge-label{
+    font-size:17px;
+    color:#64748b;
+    font-weight:800;
+}
+
+.charge-item .charge-value{
+    font-size:25px;
+    font-weight:900;
+    color:#0f766e;
+}
+
+.footer{
+    text-align:center;
+    color:#64748b;
+    font-size:16px;
+    padding:25px 10px 10px;
+}
+
+.hidden{
+    display:none !important;
 }
 
 hr{
-  border:0;
-  border-top:1px solid #e5e7eb;
-  margin:15px 0;
+    border:0;
+    border-top:1px solid #e2e8f0;
+    margin:22px 0;
 }
 
 @media(max-width:700px){
 
-  main{
-    padding:10px;
-  }
+    html{
+        font-size:18px;
+    }
 
-  .grid,
-  .stat-grid{
-    grid-template-columns:1fr;
-  }
+    body{
+        font-size:19px;
+    }
 
-  .money-list{
-    grid-template-columns:1fr 1fr;
-  }
+    .app-title{
+        font-size:24px;
+    }
 
-  h1{
-    font-size:19px;
-  }
+    .app-subtitle{
+        font-size:15px;
+    }
+
+    .container{
+        padding:14px 10px 70px;
+    }
+
+    .card{
+        padding:17px;
+        border-radius:14px;
+    }
+
+    .card-title{
+        font-size:23px;
+    }
+
+    .dashboard-grid{
+        grid-template-columns:1fr 1fr;
+        gap:10px;
+    }
+
+    .stat-card{
+        padding:14px 12px;
+    }
+
+    .stat-label{
+        font-size:15px;
+    }
+
+    .stat-value{
+        font-size:25px;
+    }
+
+    .meter-grid{
+        grid-template-columns:1fr;
+    }
+
+    .meter-name{
+        font-size:23px;
+    }
+
+    .form-grid{
+        grid-template-columns:1fr;
+        gap:13px;
+    }
+
+    .form-group.full{
+        grid-column:auto;
+    }
+
+    label{
+        font-size:19px;
+    }
+
+    input,
+    select,
+    textarea{
+        font-size:19px;
+        min-height:56px;
+    }
+
+    .btn{
+        width:100%;
+        font-size:18px;
+        min-height:56px;
+    }
+
+    .button-row{
+        display:grid;
+        grid-template-columns:1fr;
+    }
+
+    .preview-grid{
+        grid-template-columns:1fr;
+    }
+
+    .rate-row,
+    .vat-row{
+        grid-template-columns:1fr;
+        gap:8px;
+        padding:12px;
+        border:1px solid #cbd5e1;
+        border-radius:12px;
+        background:#f8fafc;
+    }
+
+    .remove-btn{
+        width:100%;
+    }
+
+    .charge-box{
+        grid-template-columns:1fr;
+    }
+
+    .nav button{
+        font-size:16px;
+        padding:11px 14px;
+    }
 }
+
+@media(min-width:701px){
+    .menu-button{
+        display:none;
+    }
+}
+
 </style>
 </head>
 
 <body>
 
-<header>
+<header class="app-header">
 
-  <div class="header-row">
+    <div class="header-row">
 
-    <div>
-      <h1>⚡ Current Bill Tracker</h1>
-      <div class="header-small">
-        দুইটি মিটারের বিদ্যুৎ বিল হিসাব
-      </div>
+        <div>
+            <h1 class="app-title">Current Bill Tracker</h1>
+            <div class="app-subtitle">
+                Two Meter Electricity Management
+            </div>
+        </div>
+
+        <button
+            class="menu-button"
+            type="button"
+            onclick="toggleNav()">
+            ☰
+        </button>
+
     </div>
 
-  </div>
+    <nav class="nav" id="mainNav">
 
-  <nav id="mainNav">
+        <button
+            id="navDashboard"
+            class="active"
+            onclick="showPage('dashboard')">
+            Dashboard
+        </button>
 
-    <button data-page="dashboard" class="active">
-      ড্যাশবোর্ড
-    </button>
+        <button
+            id="navReading"
+            onclick="showPage('reading')">
+            New Reading
+        </button>
 
-    <button data-page="reading">
-      রিডিং
-    </button>
+        <button
+            id="navHistory"
+            onclick="showPage('history')">
+            History
+        </button>
 
-    <button data-page="history">
-      হিস্টোরি
-    </button>
+        <button
+            id="navSettings"
+            onclick="showPage('settings')">
+            Settings
+        </button>
 
-    <button data-page="settings">
-      সেটিংস
-    </button>
+        <button
+            id="navBackup"
+            onclick="showPage('backup')">
+            Backup
+        </button>
 
-    <button data-page="backup">
-      ব্যাকআপ
-    </button>
-
-  </nav>
+    </nav>
 
 </header>
 
 
-<main>
+<main class="container">
 
-<!-- ================= DASHBOARD ================= -->
 
-<section id="page-dashboard" class="page active">
+<!-- =========================================================
+     DASHBOARD
+========================================================= -->
 
-  <div class="card">
+<section
+    id="pageDashboard"
+    class="page active">
 
-    <h2>ড্যাশবোর্ড</h2>
+    <div class="card">
 
-    <div class="stat-grid">
+        <h2 class="card-title">
+            Dashboard
+        </h2>
 
-      <div class="stat">
-
-        <div class="stat-title">
-          মোট ব্যবহৃত ইউনিট
+        <div class="note">
+            Meter 1 and Meter 2 are completely separate.
+            Each meter is calculated independently.
         </div>
 
-        <div class="stat-value" id="dashTotalUnits">
-          0
+    </div>
+
+
+    <div class="dashboard-grid">
+
+        <div class="stat-card">
+
+            <div class="stat-label">
+                Total Used Units
+            </div>
+
+            <div
+                id="dashTotalUnits"
+                class="stat-value">
+                0
+            </div>
+
         </div>
 
-      </div>
 
+        <div class="stat-card">
 
-      <div class="stat">
+            <div class="stat-label">
+                Total Actual Bill
+            </div>
 
-        <div class="stat-title">
-          মোট Actual Bill
+            <div
+                id="dashTotalBill"
+                class="stat-value">
+                0
+            </div>
+
         </div>
 
-        <div class="stat-value" id="dashTotalBill">
-          0
+    </div>
+
+
+    <div class="dashboard-grid">
+
+        <div class="stat-card">
+
+            <div class="stat-label">
+                Meter 1 Latest Reading
+            </div>
+
+            <div
+                id="dashM1Reading"
+                class="stat-value">
+                -
+            </div>
+
         </div>
 
-      </div>
 
+        <div class="stat-card">
 
-      <div class="stat">
+            <div class="stat-label">
+                Meter 2 Latest Reading
+            </div>
 
-        <div class="stat-title">
-          সর্বশেষ আপডেট
+            <div
+                id="dashM2Reading"
+                class="stat-value">
+                -
+            </div>
+
         </div>
+
+    </div>
+
+
+    <div class="meter-grid">
+
+        <!-- METER 1 -->
+
+        <div class="meter-card meter-one">
+
+            <h3
+                id="dashM1Name"
+                class="meter-name">
+                Meter 1
+            </h3>
+
+            <div
+                id="dashM1Number"
+                class="meter-number">
+                Meter number: -
+            </div>
+
+
+            <div class="meter-line">
+
+                <span>
+                    Opening Reading
+                </span>
+
+                <strong id="dashM1Opening">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="meter-line">
+
+                <span>
+                    Current Reading
+                </span>
+
+                <strong id="dashM1Current">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="meter-line">
+
+                <span>
+                    Used Units
+                </span>
+
+                <strong id="dashM1Units">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="meter-line">
+
+                <span>
+                    Unit Bill
+                </span>
+
+                <strong id="dashM1UnitBill">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="bill-box">
+
+                <div class="bill-line">
+
+                    <span>
+                        Energy Charge
+                    </span>
+
+                    <strong id="dashM1Energy">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="bill-line">
+
+                    <span>
+                        Meter Rent
+                    </span>
+
+                    <strong id="dashM1Rent">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="bill-line">
+
+                    <span>
+                        VAT
+                    </span>
+
+                    <strong id="dashM1Vat">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="bill-line bill-total">
+
+                    <span>
+                        Actual Bill
+                    </span>
+
+                    <strong id="dashM1Actual">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- METER 2 -->
+
+        <div class="meter-card meter-two">
+
+            <h3
+                id="dashM2Name"
+                class="meter-name">
+                Meter 2
+            </h3>
+
+            <div
+                id="dashM2Number"
+                class="meter-number">
+                Meter number: -
+            </div>
+
+
+            <div class="meter-line">
+
+                <span>
+                    Opening Reading
+                </span>
+
+                <strong id="dashM2Opening">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="meter-line">
+
+                <span>
+                    Current Reading
+                </span>
+
+                <strong id="dashM2Current">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="meter-line">
+
+                <span>
+                    Used Units
+                </span>
+
+                <strong id="dashM2Units">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="meter-line">
+
+                <span>
+                    Unit Bill
+                </span>
+
+                <strong id="dashM2UnitBill">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="bill-box">
+
+                <div class="bill-line">
+
+                    <span>
+                        Energy Charge
+                    </span>
+
+                    <strong id="dashM2Energy">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="bill-line">
+
+                    <span>
+                        Meter Rent
+                    </span>
+
+                    <strong id="dashM2Rent">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="bill-line">
+
+                    <span>
+                        VAT
+                    </span>
+
+                    <strong id="dashM2Vat">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="bill-line bill-total">
+
+                    <span>
+                        Actual Bill
+                    </span>
+
+                    <strong id="dashM2Actual">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="meter-line">
+
+            <span>
+                Last Update
+            </span>
+
+            <strong id="dashLastUpdate">
+                -
+            </strong>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     NEW READING
+========================================================= -->
+
+<section
+    id="pageReading"
+    class="page">
+
+    <div class="card">
+
+        <h2 class="card-title">
+            Add New Meter Reading
+        </h2>
+
+        <div class="note">
+            Enter a reading for one meter at a time.
+            Meter 1 and Meter 2 are calculated separately.
+        </div>
+
+
+        <div class="form-grid">
+
+            <div class="form-group">
+
+                <label for="readingMeter">
+                    Select Meter
+                </label>
+
+                <select id="readingMeter">
+
+                    <option value="1">
+                        Meter 1
+                    </option>
+
+                    <option value="2">
+                        Meter 2
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="readingDate">
+                    Reading Date
+                </label>
+
+                <input
+                    id="readingDate"
+                    type="date">
+
+            </div>
+
+
+            <div class="form-group full">
+
+                <label for="currentReading">
+                    Current Meter Reading
+                </label>
+
+                <input
+                    id="currentReading"
+                    type="number"
+                    inputmode="decimal"
+                    step="1"
+                    min="0"
+                    placeholder="Enter current meter reading">
+
+            </div>
+
+        </div>
+
+
+        <div class="button-row">
+
+            <button
+                class="btn blue"
+                type="button"
+                onclick="loadLatestForReading()">
+
+                Load Latest Reading
+
+            </button>
+
+
+            <button
+                class="btn"
+                type="button"
+                onclick="previewReading()">
+
+                Preview Bill
+
+            </button>
+
+
+            <button
+                class="btn green"
+                type="button"
+                onclick="saveReading()">
+
+                Save Reading
+
+            </button>
+
+        </div>
+
 
         <div
-          class="stat-value"
-          id="dashLastUpdate"
-          style="font-size:16px">
-          -
+            id="readingMessage"
+            class="hidden">
         </div>
 
-      </div>
+
+        <div
+            id="readingPreview"
+            class="preview hidden">
+
+            <h3>
+                Reading & Bill Preview
+            </h3>
+
+            <div class="preview-grid">
+
+                <div class="preview-item">
+                    <span>Meter</span>
+                    <strong id="previewMeter">-</strong>
+                </div>
+
+                <div class="preview-item">
+                    <span>Date</span>
+                    <strong id="previewDate">-</strong>
+                </div>
+
+                <div class="preview-item">
+                    <span>Previous Reading</span>
+                    <strong id="previewPrevious">0</strong>
+                </div>
+
+                <div class="preview-item">
+                    <span>Current Reading</span>
+                    <strong id="previewCurrent">0</strong>
+                </div>
+
+                <div class="preview-item">
+                    <span>Used Units</span>
+                    <strong id="previewUnits">0</strong>
+                </div>
+
+                <div class="preview-item">
+                    <span>Unit Bill</span>
+                    <strong id="previewUnitBill">0</strong>
+                </div>
+
+                <div class="preview-item">
+                    <span>Energy Charge</span>
+                    <strong id="previewEnergy">0</strong>
+                </div>
+
+                <div class="preview-item">
+                    <span>Meter Rent</span>
+                    <strong id="previewRent">0</strong>
+                </div>
+
+                <div class="preview-item">
+                    <span>VAT</span>
+                    <strong id="previewVat">0</strong>
+                </div>
+
+                <div class="preview-item">
+                    <span>Actual Bill</span>
+                    <strong id="previewActual">0</strong>
+                </div>
+
+            </div>
+
+        </div>
 
     </div>
-
-  </div>
-
-
-  <div id="dashboardMeters"></div>
 
 </section>
 
 
-<!-- ================= READING ================= -->
+<!-- =========================================================
+     HISTORY
+========================================================= -->
 
-<section id="page-reading" class="page">
+<section
+    id="pageHistory"
+    class="page">
 
-  <div class="card">
+    <div class="card">
 
-    <h2>নতুন রিডিং</h2>
+        <h2 class="card-title">
+            Reading & Bill History
+        </h2>
 
-    <div class="note">
+        <div class="form-grid">
 
-      প্রতিটি মিটার আলাদাভাবে হিসাব হবে।
+            <div class="form-group">
 
-      একই মাসে একই মিটারের যত রিডিংই দেওয়া হোক,
-      Energy Charge এবং Meter Rent ওই মাসে একবারই যোগ হবে।
+                <label for="historyMeter">
+                    Meter
+                </label>
 
-    </div>
+                <select id="historyMeter">
 
+                    <option value="all">
+                        All Meters
+                    </option>
 
-    <div class="grid">
+                    <option value="1">
+                        Meter 1
+                    </option>
 
-      <div>
+                    <option value="2">
+                        Meter 2
+                    </option>
 
-        <label for="readingMeter">
-          মিটার
-        </label>
+                </select>
 
-        <select id="readingMeter">
-
-          <option value="meter1">
-            মিটার ১
-          </option>
-
-          <option value="meter2">
-            মিটার ২
-          </option>
-
-        </select>
-
-      </div>
-
-
-      <div>
-
-        <label for="readingDate">
-          তারিখ
-        </label>
-
-        <input
-          type="date"
-          id="readingDate">
-
-      </div>
+            </div>
 
 
-      <div>
+            <div class="form-group">
 
-        <label for="readingValue">
-          বর্তমান রিডিং
-        </label>
+                <label for="historyFrom">
+                    From Date
+                </label>
 
-        <input
-          type="number"
-          id="readingValue"
-          step="0.01"
-          min="0"
-          placeholder="যেমন 1250">
+                <input
+                    id="historyFrom"
+                    type="date">
 
-      </div>
+            </div>
 
 
-      <div>
+            <div class="form-group">
 
-        <label for="readingLastInfo">
-          সর্বশেষ রিডিং
-        </label>
+                <label for="historyTo">
+                    To Date
+                </label>
 
-        <input
-          type="text"
-          id="readingLastInfo"
-          readonly>
+                <input
+                    id="historyTo"
+                    type="date">
 
-      </div>
+            </div>
 
-    </div>
-
-
-    <div class="actions">
-
-      <button
-        class="primary"
-        id="saveReadingBtn">
-
-        রিডিং সেভ করুন
-
-      </button>
+        </div>
 
 
-      <button
-        class="secondary"
-        id="loadLatestBtn">
+        <div class="button-row">
 
-        সর্বশেষ রিডিং দেখুন
+            <button
+                class="btn blue"
+                type="button"
+                onclick="renderHistory()">
 
-      </button>
+                Show History
+
+            </button>
+
+        </div>
 
     </div>
 
 
-    <div
-      id="readingMessage"
-      style="margin-top:10px">
+    <div class="card">
+
+        <div
+            id="historySummary"
+            class="note">
+
+            Select a meter or date range to view history.
+
+        </div>
+
+
+        <div class="table-wrap">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Date</th>
+                        <th>Meter</th>
+                        <th>Previous</th>
+                        <th>Current</th>
+                        <th>Units</th>
+                        <th>Unit Bill</th>
+                        <th>Energy Charge</th>
+                        <th>Meter Rent</th>
+                        <th>VAT</th>
+                        <th>Actual Bill</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="historyBody">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
     </div>
-
-  </div>
-
-
-  <div class="card">
-
-    <h3>
-      রিডিং প্রিভিউ
-    </h3>
-
-    <div
-      id="readingPreview"
-      class="empty">
-
-      মিটার ও রিডিং দিলে এখানে হিসাব দেখা যাবে।
-
-    </div>
-
-  </div>
 
 </section>
 
 
-<!-- ================= HISTORY ================= -->
+<!-- =========================================================
+     SETTINGS
+========================================================= -->
 
-<section id="page-history" class="page">
+<section
+    id="pageSettings"
+    class="page">
 
-  <div class="card">
+    <div class="card">
 
-    <h2>
-      রিডিং ও বিল হিস্টোরি
-    </h2>
-
-
-    <div class="grid">
-
-      <div>
-
-        <label for="historyMeter">
-          মিটার
-        </label>
-
-        <select id="historyMeter">
-
-          <option value="all">
-            সব মিটার
-          </option>
-
-          <option value="meter1">
-            মিটার ১
-          </option>
-
-          <option value="meter2">
-            মিটার ২
-          </option>
-
-        </select>
-
-      </div>
+        <h2 class="card-title">
+            Meter Settings
+        </h2>
 
 
-      <div>
+        <div class="meter-grid">
 
-        <label for="historyMonth">
-          মাস
-        </label>
+            <!-- METER 1 SETTINGS -->
 
-        <input
-          type="month"
-          id="historyMonth">
+            <div class="card"
+                 style="margin:0;background:#f8fafc;">
 
-      </div>
+                <h3 class="section-title">
+                    Meter 1
+                </h3>
+
+                <div class="form-group">
+
+                    <label for="m1Name">
+                        Meter Name
+                    </label>
+
+                    <input
+                        id="m1Name"
+                        type="text"
+                        placeholder="Example: Room 1">
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="m1Number">
+                        Meter Number
+                    </label>
+
+                    <input
+                        id="m1Number"
+                        type="text"
+                        placeholder="Enter meter number">
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="m1Opening">
+                        Opening Reading
+                    </label>
+
+                    <input
+                        id="m1Opening"
+                        type="number"
+                        inputmode="decimal"
+                        step="1"
+                        min="0">
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="m1OpeningDate">
+                        Opening Date
+                    </label>
+
+                    <input
+                        id="m1OpeningDate"
+                        type="date">
+
+                </div>
+
+            </div>
+
+
+            <!-- METER 2 SETTINGS -->
+
+            <div class="card"
+                 style="margin:0;background:#f8fafc;">
+
+                <h3 class="section-title">
+                    Meter 2
+                </h3>
+
+                <div class="form-group">
+
+                    <label for="m2Name">
+                        Meter Name
+                    </label>
+
+                    <input
+                        id="m2Name"
+                        type="text"
+                        placeholder="Example: Room 2">
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="m2Number">
+                        Meter Number
+                    </label>
+
+                    <input
+                        id="m2Number"
+                        type="text"
+                        placeholder="Enter meter number">
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="m2Opening">
+                        Opening Reading
+                    </label>
+
+                    <input
+                        id="m2Opening"
+                        type="number"
+                        inputmode="decimal"
+                        step="1"
+                        min="0">
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="m2OpeningDate">
+                        Opening Date
+                    </label>
+
+                    <input
+                        id="m2OpeningDate"
+                        type="date">
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="button-row">
+
+            <button
+                class="btn green"
+                type="button"
+                onclick="saveMeterSettings()">
+
+                Save Meter Settings
+
+            </button>
+
+        </div>
+
+
+        <div
+            id="meterSettingsMessage"
+            class="hidden">
+        </div>
 
     </div>
 
-  </div>
+
+    <!-- BILL RATES -->
+
+    <div class="card">
+
+        <h2 class="card-title">
+            Electricity Rate Settings
+        </h2>
+
+        <div class="note">
+            Enter the unit rate according to the applicable slab.
+            The software uses the saved rate table to calculate the Unit Bill.
+        </div>
 
 
-  <div class="card">
+        <div id="rateRows"></div>
 
-    <div
-      id="historyTable"
-      class="empty">
 
-      কোনো রেকর্ড নেই।
+        <div class="button-row">
+
+            <button
+                class="btn blue"
+                type="button"
+                onclick="addRateRow()">
+
+                + Add Rate Row
+
+            </button>
+
+
+            <button
+                class="btn green"
+                type="button"
+                onclick="saveRates()">
+
+                Save Rates
+
+            </button>
+
+        </div>
+
+
+        <div
+            id="rateMessage"
+            class="hidden">
+        </div>
 
     </div>
 
-  </div>
+
+    <!-- MONTHLY CHARGES -->
+
+    <div class="card">
+
+        <h2 class="card-title">
+            Monthly Charges
+        </h2>
+
+        <div class="note">
+            These charges are applied only once per meter in each month,
+            no matter how many readings are entered during that month.
+        </div>
+
+
+        <div class="charge-box">
+
+            <div class="charge-item">
+
+                <div class="charge-label">
+                    Energy Charge per Meter / Month
+                </div>
+
+                <div class="charge-value">
+                    42
+                </div>
+
+                <input
+                    id="energyCharge"
+                    type="number"
+                    inputmode="decimal"
+                    min="0"
+                    step="1"
+                    value="42">
+
+            </div>
+
+
+            <div class="charge-item">
+
+                <div class="charge-label">
+                    Meter Rent per Meter / Month
+                </div>
+
+                <div class="charge-value">
+                    10
+                </div>
+
+                <input
+                    id="meterRent"
+                    type="number"
+                    inputmode="decimal"
+                    min="0"
+                    step="1"
+                    value="10">
+
+            </div>
+
+        </div>
+
+
+        <div class="warning">
+
+            Energy Charge and Meter Rent are separate.
+            A separate Fixed Charge field is not used.
+
+        </div>
+
+
+        <div class="button-row">
+
+            <button
+                class="btn green"
+                type="button"
+                onclick="saveCharges()">
+
+                Save Monthly Charges
+
+            </button>
+
+        </div>
+
+
+        <div
+            id="chargeMessage"
+            class="hidden">
+        </div>
+
+    </div>
+
+
+    <!-- VAT -->
+
+    <div class="card">
+
+        <h2 class="card-title">
+            Monthly VAT
+        </h2>
+
+        <div class="note">
+            VAT is entered manually for each meter and month.
+            If VAT is unknown, leave it as 0.
+        </div>
+
+
+        <div id="vatRows"></div>
+
+
+        <div class="button-row">
+
+            <button
+                class="btn blue"
+                type="button"
+                onclick="addVatRow()">
+
+                + Add VAT Entry
+
+            </button>
+
+
+            <button
+                class="btn green"
+                type="button"
+                onclick="saveVat()">
+
+                Save VAT
+
+            </button>
+
+        </div>
+
+
+        <div
+            id="vatMessage"
+            class="hidden">
+        </div>
+
+    </div>
 
 </section>
 
 
-<!-- ================= SETTINGS ================= -->
+<!-- =========================================================
+     BACKUP
+========================================================= -->
 
-<section id="page-settings" class="page">
+<section
+    id="pageBackup"
+    class="page">
 
-  <div class="card">
+    <div class="card">
 
-    <h2>
-      মিটার সেটিংস
-    </h2>
+        <h2 class="card-title">
+            Backup & Restore
+        </h2>
 
-
-    <div class="grid">
-
-
-      <!-- METER 1 -->
-
-      <div
-        class="card"
-        style="margin:0">
-
-        <h3>
-          মিটার ১
-        </h3>
+        <div class="note">
+            Keep a backup file on your phone or Google Drive.
+            You can restore the data later if the browser data is lost.
+        </div>
 
 
-        <label for="m1Name">
-          মিটারের নাম
-        </label>
+        <div class="button-row">
+
+            <button
+                class="btn green"
+                type="button"
+                onclick="downloadBackup()">
+
+                Download Backup
+
+            </button>
+
+
+            <button
+                class="btn blue"
+                type="button"
+                onclick="document.getElementById('restoreFile').click()">
+
+                Restore Backup
+
+            </button>
+
+        </div>
+
 
         <input
-          id="m1Name"
-          type="text">
+            id="restoreFile"
+            type="file"
+            accept=".json,application/json"
+            class="hidden">
 
 
-        <label
-          for="m1Number"
-          style="margin-top:9px">
-
-          মিটার নম্বর
-
-        </label>
-
-        <input
-          id="m1Number"
-          type="text">
-
-
-        <label
-          for="m1OpeningReading"
-          style="margin-top:9px">
-
-          Opening Reading
-
-        </label>
-
-        <input
-          id="m1OpeningReading"
-          type="number"
-          step="0.01">
-
-
-        <label
-          for="m1OpeningDate"
-          style="margin-top:9px">
-
-          Opening Date
-
-        </label>
-
-        <input
-          id="m1OpeningDate"
-          type="date">
-
-      </div>
-
-
-      <!-- METER 2 -->
-
-      <div
-        class="card"
-        style="margin:0">
-
-        <h3>
-          মিটার ২
-        </h3>
-
-
-        <label for="m2Name">
-          মিটারের নাম
-        </label>
-
-        <input
-          id="m2Name"
-          type="text">
-
-
-        <label
-          for="m2Number"
-          style="margin-top:9px">
-
-          মিটার নম্বর
-
-        </label>
-
-        <input
-          id="m2Number"
-          type="text">
-
-
-        <label
-          for="m2OpeningReading"
-          style="margin-top:9px">
-
-          Opening Reading
-
-        </label>
-
-        <input
-          id="m2OpeningReading"
-          type="number"
-          step="0.01">
-
-
-        <label
-          for="m2OpeningDate"
-          style="margin-top:9px">
-
-          Opening Date
-
-        </label>
-
-        <input
-          id="m2OpeningDate"
-          type="date">
-
-      </div>
+        <div
+            id="backupMessage"
+            class="hidden">
+        </div>
 
     </div>
 
 
-    <div class="actions">
+    <div class="card">
 
-      <button
-        class="primary"
-        id="saveMeterSettingsBtn">
+        <h2 class="card-title">
+            Data Information
+        </h2>
 
-        মিটার সেটিংস সেভ করুন
+        <div class="meter-line">
 
-      </button>
+            <span>
+                Readings Stored
+            </span>
 
-    </div>
+            <strong id="backupReadingCount">
+                0
+            </strong>
 
-
-    <div id="settingsMessage"></div>
-
-  </div>
-
-
-  <!-- RATE -->
-
-  <div class="card">
-
-    <h2>
-      বিল রেট সেটিংস
-    </h2>
+        </div>
 
 
-    <div class="note">
+        <div class="meter-line">
 
-      আপনার বর্তমান Slab Rate এখানেই থাকবে।
+            <span>
+                VAT Entries
+            </span>
 
-    </div>
+            <strong id="backupVatCount">
+                0
+            </strong>
 
-
-    <div id="rateRows"></div>
-
-
-    <div class="actions">
-
-      <button
-        class="secondary"
-        id="addRateBtn">
-
-        নতুন Rate Row
-
-      </button>
+        </div>
 
 
-      <button
-        class="primary"
-        id="saveRatesBtn">
+        <div class="meter-line">
 
-        রেট সেভ করুন
+            <span>
+                Rate Rows
+            </span>
 
-      </button>
+            <strong id="backupRateCount">
+                0
+            </strong>
+
+        </div>
 
     </div>
-
-
-    <div id="rateMessage"></div>
-
-  </div>
-
-
-  <!-- MONTHLY CHARGES -->
-
-  <div class="card">
-
-    <h2>
-      মাসিক চার্জ
-    </h2>
-
-
-    <div class="grid">
-
-      <div>
-
-        <label for="energyChargeInput">
-          Energy Charge
-        </label>
-
-        <input
-          id="energyChargeInput"
-          type="number"
-          min="0"
-          step="1">
-
-      </div>
-
-
-      <div>
-
-        <label for="meterRentInput">
-          Meter Rent
-        </label>
-
-        <input
-          id="meterRentInput"
-          type="number"
-          min="0"
-          step="1">
-
-      </div>
-
-    </div>
-
-
-    <div class="note">
-
-      Energy Charge এবং Meter Rent আলাদা হিসাব হবে।
-
-      একই মাসে একই মিটারের জন্য প্রত্যেকটি একবার করে যোগ হবে।
-
-      <br><br>
-
-      <strong>
-        এখানে Fixed Charge 52 নামে কোনো আলাদা হিসাব নেই।
-      </strong>
-
-    </div>
-
-  </div>
-
-
-  <!-- VAT -->
-
-  <div class="card">
-
-    <h2>
-      মাসভিত্তিক VAT
-    </h2>
-
-
-    <div class="note">
-
-      VAT কোনো নির্দিষ্ট শতাংশ ধরে হিসাব হবে না।
-
-      যে মাসে যে মিটারের VAT জানা থাকবে,
-      সেই টাকা এখানে ম্যানুয়ালি লিখে দিন।
-
-      না দিলে VAT = 0 থাকবে।
-
-    </div>
-
-
-    <div class="grid">
-
-
-      <div>
-
-        <label for="vatMeter">
-          মিটার
-        </label>
-
-        <select id="vatMeter">
-
-          <option value="meter1">
-            মিটার ১
-          </option>
-
-          <option value="meter2">
-            মিটার ২
-          </option>
-
-        </select>
-
-      </div>
-
-
-      <div>
-
-        <label for="vatMonth">
-          মাস
-        </label>
-
-        <input
-          type="month"
-          id="vatMonth">
-
-      </div>
-
-
-      <div>
-
-        <label for="vatAmount">
-          VAT
-        </label>
-
-        <input
-          type="number"
-          id="vatAmount"
-          min="0"
-          step="1"
-          placeholder="যেমন 24">
-
-      </div>
-
-    </div>
-
-
-    <div class="actions">
-
-      <button
-        class="primary"
-        id="saveVatBtn">
-
-        VAT সেভ করুন
-
-      </button>
-
-    </div>
-
-
-    <div id="vatList"></div>
-
-    <div id="vatMessage"></div>
-
-  </div>
 
 </section>
 
 
-<!-- ================= BACKUP ================= -->
+<div class="footer">
 
-<section id="page-backup" class="page">
+    Current Bill Tracker<br>
+    Offline Electricity Management Software
 
-  <div class="card">
-
-    <h2>
-      Backup / Restore
-    </h2>
-
-
-    <div class="note">
-
-      নিয়মিত Backup ফাইল ফোনে রাখুন।
-
-      কোড পরিবর্তন করলেও আপনার বর্তমান ডাটা
-      localStorage-এ থাকবে।
-
-      তারপরও Backup রাখা নিরাপদ।
-
-    </div>
-
-
-    <div class="actions">
-
-      <button
-        class="primary"
-        id="backupBtn">
-
-        Backup Download
-
-      </button>
-
-
-      <button
-        class="secondary"
-        id="restoreBtn">
-
-        Backup Restore
-
-      </button>
-
-
-      <input
-        type="file"
-        id="restoreFile"
-        accept=".json,application/json"
-        style="display:none">
-
-    </div>
-
-
-    <div
-      id="backupMessage"
-      style="margin-top:10px">
-
-    </div>
-
-  </div>
-
-</section>
+</div>
 
 </main>
 
 
 <script>
 
+/* =========================================================
+   CURRENT BILL TRACKER
+   VERSION 4
+========================================================= */
+
 "use strict";
 
 
-/* =====================================================
-   DATABASE
-===================================================== */
+const APP_VERSION = 4;
 
-const STORAGE_KEY =
-  "currentBillTrackerV1";
+const STORAGE_KEY = "currentBillTrackerV1";
 
 
-const APP_VERSION = 3;
+/* =========================================================
+   SHORTCUT
+========================================================= */
 
+function $(id){
+
+    return document.getElementById(id);
+
+}
+
+
+/* =========================================================
+   DEFAULT DATABASE
+========================================================= */
 
 const DEFAULT_DB = {
 
-  version:APP_VERSION,
+    version: APP_VERSION,
 
-  meters:[
+    meters: {
 
-    {
-      id:"meter1",
-      name:"মিটার ১",
-      number:"",
-      openingReading:0,
-      openingDate:""
+        "1": {
+
+            name: "Meter 1",
+            number: "",
+            openingReading: 0,
+            openingDate: ""
+
+        },
+
+        "2": {
+
+            name: "Meter 2",
+            number: "",
+            openingReading: 0,
+            openingDate: ""
+
+        }
+
     },
 
-    {
-      id:"meter2",
-      name:"মিটার ২",
-      number:"",
-      openingReading:0,
-      openingDate:""
-    }
+    rates: [
 
-  ],
+        {
+            from: 0,
+            to: 50,
+            rate: 5
+        },
 
+        {
+            from: 51,
+            to: 75,
+            rate: 5.5
+        },
 
-  rates:[
+        {
+            from: 76,
+            to: 200,
+            rate: 6
+        },
 
-    {
-      from:0,
-      to:50,
-      rate:5
+        {
+            from: 201,
+            to: 300,
+            rate: 6.5
+        },
+
+        {
+            from: 301,
+            to: 400,
+            rate: 7
+        },
+
+        {
+            from: 401,
+            to: 999999,
+            rate: 8
+        }
+
+    ],
+
+    charges: {
+
+        energy: 42,
+        rent: 10
+
     },
 
-    {
-      from:51,
-      to:75,
-      rate:6
-    },
+    vat: [],
 
-    {
-      from:76,
-      to:100,
-      rate:7
-    },
-
-    {
-      from:101,
-      to:150,
-      rate:8
-    },
-
-    {
-      from:151,
-      to:200,
-      rate:9
-    }
-
-  ],
-
-
-  charges:{
-
-    energy:42,
-
-    rent:10
-
-  },
-
-
-  vat:[],
-
-
-  readings:[]
+    readings: []
 
 };
 
 
-let db;
+let db = null;
 
 
-/* =====================================================
-   HELPERS
-===================================================== */
-
-function $(id){
-
-  return document.getElementById(id);
-
-}
-
-
-function clone(obj){
-
-  return JSON.parse(
-    JSON.stringify(obj)
-  );
-
-}
-
-
-function numberValue(value,fallback=0){
-
-  const n = Number(value);
-
-  return Number.isFinite(n)
-    ? n
-    : fallback;
-
-}
-
-
-function money(value){
-
-  return Math.round(
-    numberValue(value)
-  ).toLocaleString("en-US");
-
-}
-
-
-function num(value){
-
-  return numberValue(value)
-    .toLocaleString(
-      "en-US",
-      {
-        minimumFractionDigits:0,
-        maximumFractionDigits:2
-      }
-    );
-
-}
-
-
-function todayString(){
-
-  const d = new Date();
-
-  const y =
-    d.getFullYear();
-
-  const m =
-    String(d.getMonth()+1)
-    .padStart(2,"0");
-
-  const day =
-    String(d.getDate())
-    .padStart(2,"0");
-
-  return y+"-"+m+"-"+day;
-
-}
-
-
-function monthKey(date){
-
-  return String(date || "")
-    .slice(0,7);
-
-}
-
-
-function formatDate(date){
-
-  if(!date)
-    return "-";
-
-  const p =
-    String(date).split("-");
-
-  if(p.length !== 3)
-    return date;
-
-  return p[2]+"-"+p[1]+"-"+p[0];
-
-}
-
-
-function escapeHtml(value){
-
-  return String(value ?? "")
-
-    .replace(/&/g,"&amp;")
-
-    .replace(/</g,"&lt;")
-
-    .replace(/>/g,"&gt;")
-
-    .replace(/"/g,"&quot;")
-
-    .replace(/'/g,"&#039;");
-
-}
-
-
-/* =====================================================
+/* =========================================================
    DATABASE LOAD
-===================================================== */
+========================================================= */
 
 function loadDatabase(){
 
-  let saved = null;
+    let raw = null;
 
-  try{
+    try{
 
-    const raw =
-      localStorage.getItem(
-        STORAGE_KEY
-      );
+        raw = localStorage.getItem(STORAGE_KEY);
 
-    if(raw){
+    }catch(error){
 
-      saved =
-        JSON.parse(raw);
-
-    }
-
-  }catch(error){
-
-    console.error(
-      "Database read error:",
-      error
-    );
-
-  }
-
-
-  db = clone(DEFAULT_DB);
-
-
-  if(saved && typeof saved === "object"){
-
-    if(
-      Array.isArray(saved.meters)
-    ){
-
-      db.meters =
-        saved.meters;
+        console.error(error);
 
     }
 
 
-    if(
-      Array.isArray(saved.rates)
-    ){
+    if(!raw){
 
-      db.rates =
-        saved.rates;
-
-    }
-
-
-    if(
-      saved.charges &&
-      typeof saved.charges === "object"
-    ){
-
-      db.charges.energy =
-        numberValue(
-          saved.charges.energy,
-          42
+        db = JSON.parse(
+            JSON.stringify(DEFAULT_DB)
         );
 
-      db.charges.rent =
-        numberValue(
-          saved.charges.rent,
-          10
-        );
+        saveDatabase();
+
+        return;
 
     }
 
 
-    if(
-      Array.isArray(saved.vat)
-    ){
+    try{
 
-      db.vat =
-        saved.vat;
+        const oldData = JSON.parse(raw);
 
-    }
+        db = {
 
+            ...JSON.parse(
+                JSON.stringify(DEFAULT_DB)
+            ),
 
-    if(
-      Array.isArray(saved.readings)
-    ){
+            ...oldData
 
-      db.readings =
-        saved.readings;
+        };
 
-    }
 
-  }
+        if(!db.meters){
 
-
-  while(db.meters.length < 2){
-
-    db.meters.push(
-      clone(
-        DEFAULT_DB.meters[
-          db.meters.length
-        ]
-      )
-    );
-
-  }
-
-
-  db.meters =
-    db.meters.slice(0,2);
-
-
-  db.meters.forEach(
-    (meter,index)=>{
-
-      meter.id =
-        index === 0
-          ? "meter1"
-          : "meter2";
-
-      if(meter.name === undefined)
-        meter.name =
-          "মিটার "+(index+1);
-
-      if(meter.number === undefined)
-        meter.number = "";
-
-      if(meter.openingReading === undefined)
-        meter.openingReading = 0;
-
-      if(meter.openingDate === undefined)
-        meter.openingDate = "";
-
-    }
-  );
-
-
-  if(!Array.isArray(db.vat))
-    db.vat = [];
-
-
-  if(!Array.isArray(db.readings))
-    db.readings = [];
-
-
-  if(!db.charges)
-    db.charges={
-      energy:42,
-      rent:10
-    };
-
-
-  db.version =
-    APP_VERSION;
-
-
-  saveDatabase();
-
-}
-
-
-function saveDatabase(){
-
-  try{
-
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(db)
-    );
-
-  }catch(error){
-
-    console.error(
-      "Database save error:",
-      error
-    );
-
-  }
-
-}
-
-
-/* =====================================================
-   METER FUNCTIONS
-===================================================== */
-
-function getMeter(id){
-
-  return db.meters.find(
-    meter=>meter.id===id
-  ) || db.meters[0];
-
-}
-
-
-function getMeterName(id){
-
-  const meter =
-    getMeter(id);
-
-  return meter
-    ? meter.name
-    : id;
-
-}
-
-
-/* =====================================================
-   READING FUNCTIONS
-===================================================== */
-
-function getReadings(id){
-
-  return db.readings
-
-    .filter(
-      reading=>
-        reading.meterId===id
-    )
-
-    .sort(
-      (a,b)=>{
-
-        if(a.date !== b.date)
-
-          return a.date
-            .localeCompare(
-              b.date
-            );
-
-        return String(
-          a.createdAt || ""
-        ).localeCompare(
-          String(
-            b.createdAt || ""
-          )
-        );
-
-      }
-    );
-
-}
-
-
-function getLatestReading(
-  id,
-  beforeDate=null
-){
-
-  let readings =
-    getReadings(id);
-
-
-  if(beforeDate){
-
-    readings =
-      readings.filter(
-        r=>r.date<=beforeDate
-      );
-
-  }
-
-
-  return readings.length
-    ? readings[readings.length-1]
-    : null;
-
-}
-
-
-function getPreviousReading(
-  id,
-  date
-){
-
-  const readings =
-    getReadings(id)
-      .filter(
-        r=>r.date<date
-      );
-
-  return readings.length
-    ? readings[readings.length-1]
-    : null;
-
-}
-
-
-/* =====================================================
-   UNIT BILL
-===================================================== */
-
-function billForUnits(units){
-
-  units =
-    Math.max(
-      0,
-      numberValue(units)
-    );
-
-
-  let remaining =
-    units;
-
-  let total = 0;
-
-
-  const rates =
-    [...db.rates].sort(
-      (a,b)=>
-        numberValue(a.from)
-        -
-        numberValue(b.from)
-    );
-
-
-  for(
-    const slab of rates
-  ){
-
-    if(remaining<=0)
-      break;
-
-
-    const from =
-      numberValue(
-        slab.from
-      );
-
-    const to =
-      numberValue(
-        slab.to
-      );
-
-    const rate =
-      numberValue(
-        slab.rate
-      );
-
-
-    if(to<from)
-      continue;
-
-
-    const capacity =
-      to-from+1;
-
-
-    const take =
-      Math.min(
-        remaining,
-        capacity
-      );
-
-
-    total +=
-      take*rate;
-
-
-    remaining -=
-      take;
-
-  }
-
-
-  if(
-    remaining>0 &&
-    rates.length
-  ){
-
-    const last =
-      rates[rates.length-1];
-
-    total +=
-      remaining*
-      numberValue(
-        last.rate
-      );
-
-  }
-
-
-  return total;
-
-}
-
-
-/* =====================================================
-   MONTHS
-===================================================== */
-
-function monthsUsedByMeter(
-  id,
-  throughDate=null
-){
-
-  const set =
-    new Set();
-
-
-  getReadings(id)
-    .forEach(
-      reading=>{
-
-        if(
-          !throughDate ||
-          reading.date<=throughDate
-        ){
-
-          const month =
-            monthKey(
-              reading.date
-            );
-
-          if(month)
-            set.add(month);
-
-        }
-
-      }
-    );
-
-
-  return [...set].sort();
-
-}
-
-
-/* =====================================================
-   VAT
-===================================================== */
-
-function getVat(
-  meterId,
-  month
-){
-
-  const item =
-    db.vat.find(
-      v=>
-        v.meterId===meterId &&
-        v.month===month
-    );
-
-
-  return item
-    ? numberValue(item.amount)
-    : 0;
-
-}
-
-
-/* =====================================================
-   BILL CALCULATION
-===================================================== */
-
-function calculateMeterBill(
-  meterId,
-  throughDate=null
-){
-
-  const meter =
-    getMeter(meterId);
-
-
-  let readings =
-    getReadings(meterId);
-
-
-  if(throughDate){
-
-    readings =
-      readings.filter(
-        r=>r.date<=throughDate
-      );
-
-  }
-
-
-  if(!readings.length){
-
-    return {
-
-      units:0,
-
-      unitBill:0,
-
-      energy:0,
-
-      rent:0,
-
-      vat:0,
-
-      actual:0,
-
-      last:null,
-
-      months:[]
-
-    };
-
-  }
-
-
-  const last =
-    readings[readings.length-1];
-
-
-  const opening =
-    numberValue(
-      meter.openingReading
-    );
-
-
-  const units =
-    Math.max(
-      0,
-      numberValue(
-        last.reading
-      )-
-      opening
-    );
-
-
-  const unitBill =
-    billForUnits(
-      units
-    );
-
-
-  const months =
-    monthsUsedByMeter(
-      meterId,
-      throughDate
-    );
-
-
-  const energy =
-    months.length *
-    numberValue(
-      db.charges.energy
-    );
-
-
-  const rent =
-    months.length *
-    numberValue(
-      db.charges.rent
-    );
-
-
-  let vat = 0;
-
-
-  months.forEach(
-    month=>{
-
-      vat +=
-        getVat(
-          meterId,
-          month
-        );
-
-    }
-  );
-
-
-  const actual =
-    unitBill+
-    energy+
-    rent+
-    vat;
-
-
-  return {
-
-    units,
-
-    unitBill,
-
-    energy,
-
-    rent,
-
-    vat,
-
-    actual,
-
-    last,
-
-    months
-
-  };
-
-}
-
-
-/* =====================================================
-   DASHBOARD
-===================================================== */
-
-function renderDashboard(){
-
-  let totalUnits = 0;
-
-  let totalBill = 0;
-
-  let lastDate = "";
-
-
-  db.meters.forEach(
-    meter=>{
-
-      const bill =
-        calculateMeterBill(
-          meter.id
-        );
-
-
-      totalUnits +=
-        bill.units;
-
-
-      totalBill +=
-        bill.actual;
-
-
-      if(
-        bill.last &&
-        bill.last.date>lastDate
-      ){
-
-        lastDate =
-          bill.last.date;
-
-      }
-
-    }
-  );
-
-
-  $("dashTotalUnits")
-    .textContent =
-      num(totalUnits);
-
-
-  $("dashTotalBill")
-    .textContent =
-      money(totalBill);
-
-
-  $("dashLastUpdate")
-    .textContent =
-      lastDate
-        ? formatDate(lastDate)
-        : "-";
-
-
-  const box =
-    $("dashboardMeters");
-
-
-  box.innerHTML = "";
-
-
-  db.meters.forEach(
-    (meter,index)=>{
-
-      const bill =
-        calculateMeterBill(
-          meter.id
-        );
-
-
-      const card =
-        document.createElement(
-          "div"
-        );
-
-
-      card.className =
-        "card meter-card";
-
-
-      card.innerHTML = `
-
-        <div class="meter-title">
-
-          ${escapeHtml(
-            meter.name ||
-            "মিটার "+(index+1)
-          )}
-
-        </div>
-
-
-        <div class="small">
-
-          মিটার নম্বর:
-          ${escapeHtml(
-            meter.number || "-"
-          )}
-
-          &nbsp; | &nbsp;
-
-          Opening Reading:
-          ${num(
-            meter.openingReading
-          )}
-
-        </div>
-
-
-        <div class="money-list">
-
-
-          <div class="money-item">
-
-            <div class="money-label">
-              ব্যবহৃত ইউনিট
-            </div>
-
-            <div class="money-value">
-              ${num(bill.units)}
-            </div>
-
-          </div>
-
-
-          <div class="money-item">
-
-            <div class="money-label">
-              Unit Bill
-            </div>
-
-            <div class="money-value">
-              ${money(bill.unitBill)}
-            </div>
-
-          </div>
-
-
-          <div class="money-item">
-
-            <div class="money-label">
-              Energy Charge
-            </div>
-
-            <div class="money-value">
-              ${money(bill.energy)}
-            </div>
-
-          </div>
-
-
-          <div class="money-item">
-
-            <div class="money-label">
-              Meter Rent
-            </div>
-
-            <div class="money-value">
-              ${money(bill.rent)}
-            </div>
-
-          </div>
-
-
-          <div class="money-item">
-
-            <div class="money-label">
-              VAT
-            </div>
-
-            <div class="money-value">
-              ${money(bill.vat)}
-            </div>
-
-          </div>
-
-
-          <div class="money-item">
-
-            <div class="money-label">
-              Actual Bill
-            </div>
-
-            <div class="money-value">
-              ${money(bill.actual)}
-            </div>
-
-          </div>
-
-
-        </div>
-
-
-        <hr>
-
-
-        <div class="grid">
-
-          <div>
-
-            <div class="small">
-              সর্বশেষ রিডিং
-            </div>
-
-            <strong>
-              ${
-                bill.last
-                  ? num(
-                      bill.last.reading
+            db.meters =
+                JSON.parse(
+                    JSON.stringify(
+                        DEFAULT_DB.meters
                     )
-                  : "-"
-              }
-            </strong>
+                );
 
-          </div>
+        }
 
 
-          <div>
+        if(!db.meters["1"]){
 
-            <div class="small">
-              তারিখ
-            </div>
-
-            <strong>
-              ${
-                bill.last
-                  ? formatDate(
-                      bill.last.date
+            db.meters["1"] =
+                JSON.parse(
+                    JSON.stringify(
+                        DEFAULT_DB.meters["1"]
                     )
-                  : "-"
-              }
-            </strong>
-
-          </div>
-
-        </div>
-
-      `;
-
-
-      box.appendChild(card);
-
-    }
-  );
-
-}
-
-
-/* =====================================================
-   SETTINGS
-===================================================== */
-
-function loadSettingsForm(){
-
-  const m1 =
-    getMeter("meter1");
-
-  const m2 =
-    getMeter("meter2");
-
-
-  $("m1Name").value =
-    m1.name || "";
-
-  $("m1Number").value =
-    m1.number || "";
-
-  $("m1OpeningReading").value =
-    numberValue(
-      m1.openingReading
-    );
-
-  $("m1OpeningDate").value =
-    m1.openingDate || "";
-
-
-  $("m2Name").value =
-    m2.name || "";
-
-  $("m2Number").value =
-    m2.number || "";
-
-  $("m2OpeningReading").value =
-    numberValue(
-      m2.openingReading
-    );
-
-  $("m2OpeningDate").value =
-    m2.openingDate || "";
-
-
-  $("energyChargeInput").value =
-    numberValue(
-      db.charges.energy,
-      42
-    );
-
-
-  $("meterRentInput").value =
-    numberValue(
-      db.charges.rent,
-      10
-    );
-
-}
-
-
-function saveMeterSettings(){
-
-  const m1 =
-    getMeter("meter1");
-
-  const m2 =
-    getMeter("meter2");
-
-
-  m1.name =
-    $("m1Name").value.trim()
-    ||
-    "মিটার ১";
-
-
-  m1.number =
-    $("m1Number").value.trim();
-
-
-  m1.openingReading =
-    numberValue(
-      $("m1OpeningReading").value
-    );
-
-
-  m1.openingDate =
-    $("m1OpeningDate").value;
-
-
-  m2.name =
-    $("m2Name").value.trim()
-    ||
-    "মিটার ২";
-
-
-  m2.number =
-    $("m2Number").value.trim();
-
-
-  m2.openingReading =
-    numberValue(
-      $("m2OpeningReading").value
-    );
-
-
-  m2.openingDate =
-    $("m2OpeningDate").value;
-
-
-  saveDatabase();
-
-
-  $("settingsMessage").innerHTML =
-    '<div class="success">মিটার সেটিংস সফলভাবে সেভ হয়েছে।</div>';
-
-
-  renderAll();
-
-}
-
-
-function saveCharges(){
-
-  db.charges.energy =
-    Math.max(
-      0,
-      numberValue(
-        $("energyChargeInput").value,
-        42
-      )
-    );
-
-
-  db.charges.rent =
-    Math.max(
-      0,
-      numberValue(
-        $("meterRentInput").value,
-        10
-      )
-    );
-
-
-  saveDatabase();
-
-
-  $("settingsMessage").innerHTML =
-    '<div class="success">মাসিক চার্জ সেভ হয়েছে।</div>';
-
-
-  renderDashboard();
-
-}
-
-
-/* =====================================================
-   RATE SETTINGS
-===================================================== */
-
-function renderRateRows(){
-
-  const box =
-    $("rateRows");
-
-
-  box.innerHTML = "";
-
-
-  db.rates.forEach(
-    (rate,index)=>{
-
-      const row =
-        document.createElement(
-          "div"
-        );
-
-
-      row.className =
-        "grid";
-
-
-      row.style.marginBottom =
-        "8px";
-
-
-      row.innerHTML = `
-
-        <div>
-
-          <label>
-            From
-          </label>
-
-          <input
-            class="rate-from"
-            data-index="${index}"
-            type="number"
-            value="${numberValue(rate.from)}">
-
-        </div>
-
-
-        <div>
-
-          <label>
-            To
-          </label>
-
-          <input
-            class="rate-to"
-            data-index="${index}"
-            type="number"
-            value="${numberValue(rate.to)}">
-
-        </div>
-
-
-        <div>
-
-          <label>
-            Rate
-          </label>
-
-          <input
-            class="rate-rate"
-            data-index="${index}"
-            type="number"
-            step="0.01"
-            value="${numberValue(rate.rate)}">
-
-        </div>
-
-
-        <div
-          style="display:flex;align-items:end">
-
-          <button
-            class="danger remove-rate"
-            data-index="${index}"
-            type="button">
-
-            মুছুন
-
-          </button>
-
-        </div>
-
-      `;
-
-
-      box.appendChild(row);
-
-    }
-  );
-
-
-  box
-    .querySelectorAll(
-      ".remove-rate"
-    )
-    .forEach(
-      button=>{
-
-        button.addEventListener(
-          "click",
-          ()=>{
-
-            const index =
-              Number(
-                button.dataset.index
-              );
-
-
-            db.rates.splice(
-              index,
-              1
-            );
-
-
-            renderRateRows();
-
-          }
-        );
-
-      }
-    );
-
-}
-
-
-function addRate(){
-
-  const last =
-    db.rates[
-      db.rates.length-1
-    ];
-
-
-  const from =
-    last
-      ? numberValue(
-          last.to
-        )+1
-      : 0;
-
-
-  db.rates.push({
-
-    from:from,
-
-    to:from+49,
-
-    rate:
-      last
-        ? numberValue(
-            last.rate
-          )
-        : 0
-
-  });
-
-
-  renderRateRows();
-
-}
-
-
-function saveRates(){
-
-  const fromInputs =
-    document.querySelectorAll(
-      ".rate-from"
-    );
-
-
-  const toInputs =
-    document.querySelectorAll(
-      ".rate-to"
-    );
-
-
-  const rateInputs =
-    document.querySelectorAll(
-      ".rate-rate"
-    );
-
-
-  const newRates = [];
-
-
-  for(
-    let i=0;
-    i<fromInputs.length;
-    i++
-  ){
-
-    const from =
-      numberValue(
-        fromInputs[i].value
-      );
-
-
-    const to =
-      numberValue(
-        toInputs[i].value
-      );
-
-
-    const rate =
-      numberValue(
-        rateInputs[i].value
-      );
-
-
-    if(to<from){
-
-      $("rateMessage").innerHTML =
-        '<div class="error">To, From-এর চেয়ে ছোট হতে পারবে না।</div>';
-
-      return;
-
-    }
-
-
-    newRates.push({
-
-      from,
-      to,
-      rate
-
-    });
-
-  }
-
-
-  db.rates =
-    newRates;
-
-
-  db.rates.sort(
-    (a,b)=>
-      a.from-b.from
-  );
-
-
-  saveDatabase();
-
-
-  $("rateMessage").innerHTML =
-    '<div class="success">রেট সফলভাবে সেভ হয়েছে।</div>';
-
-
-  renderDashboard();
-
-}
-
-
-/* =====================================================
-   READING
-===================================================== */
-
-function renderReadingInfo(){
-
-  const meterId =
-    $("readingMeter").value;
-
-
-  const last =
-    getLatestReading(
-      meterId
-    );
-
-
-  if(last){
-
-    $("readingLastInfo").value =
-      num(last.reading)
-      +" ("
-      +formatDate(last.date)
-      +")";
-
-  }else{
-
-    const meter =
-      getMeter(meterId);
-
-
-    $("readingLastInfo").value =
-      num(
-        meter.openingReading
-      )
-      +" (Opening)";
-
-  }
-
-}
-
-
-function saveReading(){
-
-  const meterId =
-    $("readingMeter").value;
-
-
-  const date =
-    $("readingDate").value;
-
-
-  if(!date){
-
-    $("readingMessage").innerHTML =
-      '<div class="error">তারিখ দিন।</div>';
-
-    return;
-
-  }
-
-
-  if(
-    $("readingValue").value === ""
-  ){
-
-    $("readingMessage").innerHTML =
-      '<div class="error">বর্তমান রিডিং দিন।</div>';
-
-    return;
-
-  }
-
-
-  const reading =
-    numberValue(
-      $("readingValue").value
-    );
-
-
-  const meter =
-    getMeter(meterId);
-
-
-  if(
-    reading <
-    numberValue(
-      meter.openingReading
-    )
-  ){
-
-    $("readingMessage").innerHTML =
-      '<div class="error">Reading, Opening Reading-এর চেয়ে ছোট হতে পারবে না।</div>';
-
-    return;
-
-  }
-
-
-  const previous =
-    getPreviousReading(
-      meterId,
-      date
-    );
-
-
-  if(
-    previous &&
-    reading <
-    numberValue(
-      previous.reading
-    )
-  ){
-
-    $("readingMessage").innerHTML =
-      '<div class="error">আগের রিডিংয়ের চেয়ে নতুন রিডিং ছোট হতে পারবে না।</div>';
-
-    return;
-
-  }
-
-
-  const existing =
-    db.readings.find(
-      r=>
-        r.meterId===meterId &&
-        r.date===date
-    );
-
-
-  if(existing){
-
-    existing.reading =
-      reading;
-
-    existing.updatedAt =
-      new Date().toISOString();
-
-  }else{
-
-    db.readings.push({
-
-      id:
-        "RD-"+
-        Date.now()+
-        "-"+
-        Math.random()
-          .toString(36)
-          .slice(2,7),
-
-      meterId,
-
-      date,
-
-      reading,
-
-      createdAt:
-        new Date().toISOString()
-
-    });
-
-  }
-
-
-  saveDatabase();
-
-
-  $("readingValue").value = "";
-
-
-  $("readingMessage").innerHTML =
-    '<div class="success">রিডিং সফলভাবে সেভ হয়েছে।</div>';
-
-
-  renderReadingInfo();
-
-  renderReadingPreview();
-
-  renderDashboard();
-
-  renderHistory();
-
-}
-
-
-function loadLatestReading(){
-
-  const meterId =
-    $("readingMeter").value;
-
-
-  const last =
-    getLatestReading(
-      meterId
-    );
-
-
-  if(last){
-
-    $("readingDate").value =
-      last.date;
-
-    $("readingValue").value =
-      last.reading;
-
-  }else{
-
-    const meter =
-      getMeter(meterId);
-
-
-    $("readingDate").value =
-      todayString();
-
-
-    $("readingValue").value =
-      numberValue(
-        meter.openingReading
-      );
-
-  }
-
-
-  renderReadingInfo();
-
-  renderReadingPreview();
-
-}
-
-
-/* =====================================================
-   READING PREVIEW
-===================================================== */
-
-function renderReadingPreview(){
-
-  const meterId =
-    $("readingMeter").value;
-
-
-  const date =
-    $("readingDate").value
-    ||
-    todayString();
-
-
-  const input =
-    $("readingValue").value;
-
-
-  if(input===""){
-
-    const bill =
-      calculateMeterBill(
-        meterId
-      );
-
-
-    if(!bill.last){
-
-      $("readingPreview").innerHTML =
-        '<div class="empty">মিটার ও রিডিং দিলে এখানে হিসাব দেখা যাবে।</div>';
-
-      return;
-
-    }
-
-
-    $("readingPreview").innerHTML = `
-
-      <div class="grid">
-
-        <div>
-
-          <span class="small">
-            সর্বশেষ রিডিং
-          </span>
-
-          <br>
-
-          <strong>
-            ${num(bill.last.reading)}
-          </strong>
-
-        </div>
-
-
-        <div>
-
-          <span class="small">
-            তারিখ
-          </span>
-
-          <br>
-
-          <strong>
-            ${formatDate(bill.last.date)}
-          </strong>
-
-        </div>
-
-
-        <div>
-
-          <span class="small">
-            Unit Bill
-          </span>
-
-          <br>
-
-          <strong>
-            ${money(bill.unitBill)}
-          </strong>
-
-        </div>
-
-
-        <div>
-
-          <span class="small">
-            Energy Charge
-          </span>
-
-          <br>
-
-          <strong>
-            ${money(bill.energy)}
-          </strong>
-
-        </div>
-
-
-        <div>
-
-          <span class="small">
-            Meter Rent
-          </span>
-
-          <br>
-
-          <strong>
-            ${money(bill.rent)}
-          </strong>
-
-        </div>
-
-
-        <div>
-
-          <span class="small">
-            VAT
-          </span>
-
-          <br>
-
-          <strong>
-            ${money(bill.vat)}
-          </strong>
-
-        </div>
-
-
-        <div>
-
-          <span class="small">
-            Actual Bill
-          </span>
-
-          <br>
-
-          <strong>
-            ${money(bill.actual)}
-          </strong>
-
-        </div>
-
-      </div>
-
-    `;
-
-
-    return;
-
-  }
-
-
-  const reading =
-    numberValue(
-      input
-    );
-
-
-  const meter =
-    getMeter(meterId);
-
-
-  const units =
-    Math.max(
-      0,
-      reading-
-      numberValue(
-        meter.openingReading
-      )
-    );
-
-
-  const unitBill =
-    billForUnits(
-      units
-    );
-
-
-  const months =
-    monthsUsedByMeter(
-      meterId,
-      date
-    );
-
-
-  const currentMonth =
-    monthKey(date);
-
-
-  /*
-    যদি এই নতুন রিডিংয়ের মাসে আগে কোনো
-    reading না থাকে, তাহলে এই মাসও যোগ হবে।
-  */
-
-  if(
-    currentMonth &&
-    !months.includes(
-      currentMonth
-    )
-  ){
-
-    months.push(
-      currentMonth
-    );
-
-  }
-
-
-  const energy =
-    months.length *
-    numberValue(
-      db.charges.energy
-    );
-
-
-  const rent =
-    months.length *
-    numberValue(
-      db.charges.rent
-    );
-
-
-  let vat = 0;
-
-
-  months.forEach(
-    month=>{
-
-      vat +=
-        getVat(
-          meterId,
-          month
-        );
-
-    }
-  );
-
-
-  const actual =
-    unitBill+
-    energy+
-    rent+
-    vat;
-
-
-  $("readingPreview").innerHTML = `
-
-    <div class="grid">
-
-
-      <div>
-
-        <span class="small">
-          বর্তমান রিডিং
-        </span>
-
-        <br>
-
-        <strong>
-          ${num(reading)}
-        </strong>
-
-      </div>
-
-
-      <div>
-
-        <span class="small">
-          তারিখ
-        </span>
-
-        <br>
-
-        <strong>
-          ${formatDate(date)}
-        </strong>
-
-      </div>
-
-
-      <div>
-
-        <span class="small">
-          ব্যবহৃত ইউনিট
-        </span>
-
-        <br>
-
-        <strong>
-          ${num(units)}
-        </strong>
-
-      </div>
-
-
-      <div>
-
-        <span class="small">
-          Unit Bill
-        </span>
-
-        <br>
-
-        <strong>
-          ${money(unitBill)}
-        </strong>
-
-      </div>
-
-
-      <div>
-
-        <span class="small">
-          Energy Charge
-        </span>
-
-        <br>
-
-        <strong>
-          ${money(energy)}
-        </strong>
-
-      </div>
-
-
-      <div>
-
-        <span class="small">
-          Meter Rent
-        </span>
-
-        <br>
-
-        <strong>
-          ${money(rent)}
-        </strong>
-
-      </div>
-
-
-      <div>
-
-        <span class="small">
-          VAT
-        </span>
-
-        <br>
-
-        <strong>
-          ${money(vat)}
-        </strong>
-
-      </div>
-
-
-      <div>
-
-        <span class="small">
-          Actual Bill
-        </span>
-
-        <br>
-
-        <strong>
-          ${money(actual)}
-        </strong>
-
-      </div>
-
-
-    </div>
-
-  `;
-
-}
-
-
-/* =====================================================
-   HISTORY
-===================================================== */
-
-function renderHistory(){
-
-  const meterFilter =
-    $("historyMeter").value;
-
-
-  const monthFilter =
-    $("historyMonth").value;
-
-
-  let rows =
-    [...db.readings];
-
-
-  if(
-    meterFilter!=="all"
-  ){
-
-    rows =
-      rows.filter(
-        r=>
-          r.meterId===
-          meterFilter
-      );
-
-  }
-
-
-  if(monthFilter){
-
-    rows =
-      rows.filter(
-        r=>
-          monthKey(r.date)===
-          monthFilter
-      );
-
-  }
-
-
-  rows.sort(
-    (a,b)=>{
-
-      if(a.date!==b.date){
-
-        return b.date.localeCompare(
-          a.date
-        );
-
-      }
-
-      return String(
-        b.createdAt || ""
-      ).localeCompare(
-        String(
-          a.createdAt || ""
-        )
-      );
-
-    }
-  );
-
-
-  if(!rows.length){
-
-    $("historyTable").innerHTML =
-      '<div class="empty">কোনো রেকর্ড নেই।</div>';
-
-    return;
-
-  }
-
-
-  let html = `
-
-    <div class="table-wrap">
-
-      <table>
-
-        <thead>
-
-          <tr>
-
-            <th>
-              তারিখ
-            </th>
-
-            <th>
-              মিটার
-            </th>
-
-            <th>
-              রিডিং
-            </th>
-
-            <th>
-              ব্যবহৃত ইউনিট
-            </th>
-
-            <th>
-              Unit Bill
-            </th>
-
-            <th>
-              Energy Charge
-            </th>
-
-            <th>
-              Meter Rent
-            </th>
-
-            <th>
-              VAT
-            </th>
-
-            <th>
-              Actual Bill
-            </th>
-
-            <th>
-              Action
-            </th>
-
-          </tr>
-
-        </thead>
-
-        <tbody>
-
-  `;
-
-
-  rows.forEach(
-    reading=>{
-
-      const bill =
-        calculateMeterBill(
-          reading.meterId,
-          reading.date
-        );
-
-
-      html += `
-
-        <tr>
-
-          <td>
-            ${formatDate(
-              reading.date
-            )}
-          </td>
-
-
-          <td>
-            ${escapeHtml(
-              getMeterName(
-                reading.meterId
-              )
-            )}
-          </td>
-
-
-          <td>
-            ${num(
-              reading.reading
-            )}
-          </td>
-
-
-          <td>
-            ${num(
-              bill.units
-            )}
-          </td>
-
-
-          <td>
-            ${money(
-              bill.unitBill
-            )}
-          </td>
-
-
-          <td>
-            ${money(
-              bill.energy
-            )}
-          </td>
-
-
-          <td>
-            ${money(
-              bill.rent
-            )}
-          </td>
-
-
-          <td>
-            ${money(
-              bill.vat
-            )}
-          </td>
-
-
-          <td>
-            <strong>
-              ${money(
-                bill.actual
-              )}
-            </strong>
-          </td>
-
-
-          <td>
-
-            <button
-              class="secondary edit-reading"
-              data-id="${escapeHtml(
-                reading.id
-              )}">
-
-              Edit
-
-            </button>
-
-
-            <button
-              class="danger delete-reading"
-              data-id="${escapeHtml(
-                reading.id
-              )}">
-
-              Delete
-
-            </button>
-
-          </td>
-
-        </tr>
-
-      `;
-
-    }
-  );
-
-
-  html += `
-
-        </tbody>
-
-      </table>
-
-    </div>
-
-  `;
-
-
-  $("historyTable").innerHTML =
-    html;
-
-
-  document
-    .querySelectorAll(
-      ".edit-reading"
-    )
-    .forEach(
-      button=>{
-
-        button.addEventListener(
-          "click",
-          ()=>{
-
-            const reading =
-              db.readings.find(
-                r=>
-                  r.id===
-                  button.dataset.id
-              );
-
-
-            if(!reading)
-              return;
-
-
-            $("readingMeter").value =
-              reading.meterId;
-
-
-            $("readingDate").value =
-              reading.date;
-
-
-            $("readingValue").value =
-              reading.reading;
-
-
-            showPage(
-              "reading"
-            );
-
-
-            renderReadingInfo();
-
-            renderReadingPreview();
-
-
-            window.scrollTo({
-              top:0,
-              behavior:"smooth"
-            });
-
-          }
-        );
-
-      }
-    );
-
-
-  document
-    .querySelectorAll(
-      ".delete-reading"
-    )
-    .forEach(
-      button=>{
-
-        button.addEventListener(
-          "click",
-          ()=>{
-
-            const reading =
-              db.readings.find(
-                r=>
-                  r.id===
-                  button.dataset.id
-              );
-
-
-            if(!reading)
-              return;
-
-
-            if(
-              !confirm(
-                "এই রিডিংটি মুছে ফেলবেন?"
-              )
-            ){
-
-              return;
-
-            }
-
-
-            db.readings =
-              db.readings.filter(
-                r=>
-                  r.id!==
-                  reading.id
-              );
-
-
-            saveDatabase();
-
-
-            renderHistory();
-
-            renderDashboard();
-
-            renderReadingInfo();
-
-            renderReadingPreview();
-
-          }
-        );
-
-      }
-    );
-
-}
-
-
-/* =====================================================
-   VAT
-===================================================== */
-
-function saveVat(){
-
-  const meterId =
-    $("vatMeter").value;
-
-
-  const month =
-    $("vatMonth").value;
-
-
-  const amount =
-    Math.max(
-      0,
-      numberValue(
-        $("vatAmount").value
-      )
-    );
-
-
-  if(!month){
-
-    $("vatMessage").innerHTML =
-      '<div class="error">মাস নির্বাচন করুন।</div>';
-
-    return;
-
-  }
-
-
-  const existing =
-    db.vat.find(
-      v=>
-        v.meterId===meterId &&
-        v.month===month
-    );
-
-
-  if(existing){
-
-    existing.amount =
-      amount;
-
-  }else{
-
-    db.vat.push({
-
-      meterId,
-
-      month,
-
-      amount
-
-    });
-
-  }
-
-
-  saveDatabase();
-
-
-  $("vatAmount").value =
-    "";
-
-
-  $("vatMessage").innerHTML =
-    '<div class="success">VAT সফলভাবে সেভ হয়েছে।</div>';
-
-
-  renderVatList();
-
-  renderDashboard();
-
-  renderHistory();
-
-}
-
-
-function renderVatList(){
-
-  const box =
-    $("vatList");
-
-
-  if(!db.vat.length){
-
-    box.innerHTML =
-      '<div class="empty">কোনো VAT এন্ট্রি নেই।</div>';
-
-    return;
-
-  }
-
-
-  const rows =
-    [...db.vat].sort(
-      (a,b)=>{
-
-        if(a.month!==b.month)
-
-          return b.month.localeCompare(
-            a.month
-          );
-
-        return a.meterId.localeCompare(
-          b.meterId
-        );
-
-      }
-    );
-
-
-  let html = `
-
-    <hr>
-
-    <div class="table-wrap">
-
-      <table>
-
-        <thead>
-
-          <tr>
-
-            <th>
-              মিটার
-            </th>
-
-            <th>
-              মাস
-            </th>
-
-            <th>
-              VAT
-            </th>
-
-            <th>
-              Action
-            </th>
-
-          </tr>
-
-        </thead>
-
-        <tbody>
-
-  `;
-
-
-  rows.forEach(
-    vat=>{
-
-      html += `
-
-        <tr>
-
-          <td>
-            ${escapeHtml(
-              getMeterName(
-                vat.meterId
-              )
-            )}
-          </td>
-
-          <td>
-            ${escapeHtml(
-              vat.month
-            )}
-          </td>
-
-          <td>
-            ${money(
-              vat.amount
-            )}
-          </td>
-
-          <td>
-
-            <button
-              class="secondary edit-vat"
-              data-meter="${escapeHtml(
-                vat.meterId
-              )}"
-              data-month="${escapeHtml(
-                vat.month
-              )}">
-
-              Edit
-
-            </button>
-
-
-            <button
-              class="danger delete-vat"
-              data-meter="${escapeHtml(
-                vat.meterId
-              )}"
-              data-month="${escapeHtml(
-                vat.month
-              )}">
-
-              Delete
-
-            </button>
-
-          </td>
-
-        </tr>
-
-      `;
-
-    }
-  );
-
-
-  html += `
-
-        </tbody>
-
-      </table>
-
-    </div>
-
-  `;
-
-
-  box.innerHTML =
-    html;
-
-
-  box
-    .querySelectorAll(
-      ".edit-vat"
-    )
-    .forEach(
-      button=>{
-
-        button.addEventListener(
-          "click",
-          ()=>{
-
-            $("vatMeter").value =
-              button.dataset.meter;
-
-
-            $("vatMonth").value =
-              button.dataset.month;
-
-
-            const vat =
-              db.vat.find(
-                v=>
-                  v.meterId===
-                  button.dataset.meter &&
-                  v.month===
-                  button.dataset.month
-              );
-
-
-            $("vatAmount").value =
-              vat
-                ? numberValue(
-                    vat.amount
-                  )
-                : 0;
-
-          }
-        );
-
-      }
-    );
-
-
-  box
-    .querySelectorAll(
-      ".delete-vat"
-    )
-    .forEach(
-      button=>{
-
-        button.addEventListener(
-          "click",
-          ()=>{
-
-            if(
-              !confirm(
-                "এই VAT এন্ট্রি মুছে ফেলবেন?"
-              )
-            ){
-
-              return;
-
-            }
-
-
-            db.vat =
-              db.vat.filter(
-                vat=>
-                  !(
-                    vat.meterId===
-                    button.dataset.meter &&
-                    vat.month===
-                    button.dataset.month
-                  )
-              );
-
-
-            saveDatabase();
-
-            renderVatList();
-
-            renderDashboard();
-
-            renderHistory();
-
-          }
-        );
-
-      }
-    );
-
-}
-
-
-/* =====================================================
-   BACKUP
-===================================================== */
-
-function backupData(){
-
-  const backup = {
-
-    app:
-      "Current Bill Tracker",
-
-    version:
-      APP_VERSION,
-
-    exportedAt:
-      new Date().toISOString(),
-
-    data:
-      clone(db)
-
-  };
-
-
-  const blob =
-    new Blob(
-      [
-        JSON.stringify(
-          backup,
-          null,
-          2
-        )
-      ],
-      {
-        type:
-          "application/json"
-      }
-    );
-
-
-  const url =
-    URL.createObjectURL(
-      blob
-    );
-
-
-  const a =
-    document.createElement(
-      "a"
-    );
-
-
-  const stamp =
-    new Date()
-      .toISOString()
-      .slice(0,10);
-
-
-  a.href =
-    url;
-
-
-  a.download =
-    "current-bill-tracker-backup-"+
-    stamp+
-    ".json";
-
-
-  document.body.appendChild(a);
-
-
-  a.click();
-
-
-  a.remove();
-
-
-  setTimeout(
-    ()=>{
-      URL.revokeObjectURL(
-        url
-      );
-    },
-    1000
-  );
-
-
-  $("backupMessage").innerHTML =
-    '<div class="success">Backup ফাইল তৈরি হয়েছে।</div>';
-
-}
-
-
-function restoreData(file){
-
-  if(!file)
-    return;
-
-
-  const reader =
-    new FileReader();
-
-
-  reader.onload =
-    function(){
-
-      try{
-
-        const parsed =
-          JSON.parse(
-            reader.result
-          );
-
-
-        const restored =
-          parsed &&
-          parsed.data
-            ? parsed.data
-            : parsed;
-
-
-        if(
-          !restored ||
-          typeof restored!=="object"
-        ){
-
-          throw new Error(
-            "Invalid backup"
-          );
+                );
 
         }
 
 
-        if(
-          !confirm(
-            "বর্তমান ডাটার পরিবর্তে Backup ডাটা Restore করবেন?"
-          )
-        ){
+        if(!db.meters["2"]){
 
-          return;
-
-        }
-
-
-        db =
-          clone(
-            DEFAULT_DB
-          );
-
-
-        if(
-          Array.isArray(
-            restored.meters
-          )
-        ){
-
-          db.meters =
-            restored.meters;
+            db.meters["2"] =
+                JSON.parse(
+                    JSON.stringify(
+                        DEFAULT_DB.meters["2"]
+                    )
+                );
 
         }
 
 
-        if(
-          Array.isArray(
-            restored.rates
-          )
-        ){
+        if(!Array.isArray(db.rates)){
 
-          db.rates =
-            restored.rates;
-
-        }
-
-
-        if(
-          restored.charges
-        ){
-
-          db.charges =
-            restored.charges;
-
-        }
-
-
-        if(
-          Array.isArray(
-            restored.vat
-          )
-        ){
-
-          db.vat =
-            restored.vat;
-
-        }
-
-
-        if(
-          Array.isArray(
-            restored.readings
-          )
-        ){
-
-          db.readings =
-            restored.readings;
+            db.rates =
+                JSON.parse(
+                    JSON.stringify(
+                        DEFAULT_DB.rates
+                    )
+                );
 
         }
 
 
         if(!db.charges){
 
-          db.charges={
-            energy:42,
-            rent:10
-          };
+            db.charges =
+                JSON.parse(
+                    JSON.stringify(
+                        DEFAULT_DB.charges
+                    )
+                );
 
         }
 
 
-        db.meters =
-          db.meters.slice(0,2);
-
-
-        while(
-          db.meters.length<2
+        if(
+            typeof db.charges.energy !== "number"
         ){
 
-          db.meters.push(
-            clone(
-              DEFAULT_DB.meters[
-                db.meters.length
-              ]
-            )
-          );
+            db.charges.energy = 42;
 
         }
 
 
-        db.meters[0].id =
-          "meter1";
+        if(
+            typeof db.charges.rent !== "number"
+        ){
+
+            db.charges.rent = 10;
+
+        }
 
 
-        db.meters[1].id =
-          "meter2";
+        if(!Array.isArray(db.vat)){
 
+            db.vat = [];
+
+        }
+
+
+        if(!Array.isArray(db.readings)){
+
+            db.readings = [];
+
+        }
+
+
+        db.version = APP_VERSION;
 
         saveDatabase();
 
-
-        renderAll();
-
-
-        $("backupMessage").innerHTML =
-          '<div class="success">Backup Restore সফল হয়েছে।</div>';
-
-
-      }catch(error){
+    }catch(error){
 
         console.error(
-          error
+            "Database error:",
+            error
+        );
+
+        db = JSON.parse(
+            JSON.stringify(DEFAULT_DB)
+        );
+
+        saveDatabase();
+
+    }
+
+}
+
+
+/* =========================================================
+   DATABASE SAVE
+========================================================= */
+
+function saveDatabase(){
+
+    try{
+
+        localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify(db)
+        );
+
+    }catch(error){
+
+        console.error(error);
+
+        alert(
+            "The browser could not save the data."
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   NUMBER HELPERS
+========================================================= */
+
+function num(value){
+
+    const n = Number(value);
+
+    return Number.isFinite(n) ? n : 0;
+
+}
+
+
+function money(value){
+
+    const n = num(value);
+
+    if(
+        Math.abs(n - Math.round(n)) < 0.000001
+    ){
+
+        return String(
+            Math.round(n)
+        );
+
+    }
+
+    return String(
+        Math.round(n * 100) / 100
+    );
+
+}
+
+
+function units(value){
+
+    const n = num(value);
+
+    if(
+        Math.abs(n - Math.round(n)) < 0.000001
+    ){
+
+        return String(
+            Math.round(n)
+        );
+
+    }
+
+    return String(
+        Math.round(n * 100) / 100
+    );
+
+}
+
+
+function pad(n){
+
+    return String(n).padStart(2,"0");
+
+}
+
+
+function today(){
+
+    const d = new Date();
+
+    return (
+        d.getFullYear() +
+        "-" +
+        pad(d.getMonth()+1) +
+        "-" +
+        pad(d.getDate())
+    );
+
+}
+
+
+function monthKey(date){
+
+    if(!date){
+
+        return "";
+
+    }
+
+    return String(date).slice(0,7);
+
+}
+
+
+function formatDate(date){
+
+    if(!date){
+
+        return "-";
+
+    }
+
+    const parts =
+        String(date).split("-");
+
+    if(parts.length !== 3){
+
+        return date;
+
+    }
+
+    return (
+        parts[2] +
+        "-" +
+        parts[1] +
+        "-" +
+        parts[0]
+    );
+
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+function showPage(page){
+
+    document
+        .querySelectorAll(".page")
+        .forEach(
+            function(el){
+
+                el.classList.remove(
+                    "active"
+                );
+
+            }
         );
 
 
-        $("backupMessage").innerHTML =
-          '<div class="error">Backup ফাইলটি সঠিক নয় বা পড়া যায়নি।</div>';
+    document
+        .querySelectorAll(".nav button")
+        .forEach(
+            function(el){
 
-      }
+                el.classList.remove(
+                    "active"
+                );
+
+            }
+        );
+
+
+    const pageEl =
+        $("page" +
+            page.charAt(0).toUpperCase() +
+            page.slice(1)
+        );
+
+
+    const navEl =
+        $("nav" +
+            page.charAt(0).toUpperCase() +
+            page.slice(1)
+        );
+
+
+    if(pageEl){
+
+        pageEl.classList.add(
+            "active"
+        );
+
+    }
+
+
+    if(navEl){
+
+        navEl.classList.add(
+            "active"
+        );
+
+    }
+
+
+    if(page === "dashboard"){
+
+        renderDashboard();
+
+    }
+
+
+    if(page === "history"){
+
+        renderHistory();
+
+    }
+
+
+    if(page === "settings"){
+
+        loadSettingsForm();
+
+    }
+
+
+    if(page === "backup"){
+
+        renderBackupInfo();
+
+    }
+
+
+    window.scrollTo(
+        {
+            top:0,
+            behavior:"smooth"
+        }
+    );
+
+}
+
+
+function toggleNav(){
+
+    const nav = $("mainNav");
+
+    if(!nav){
+
+        return;
+
+    }
+
+    if(
+        nav.style.display === "none"
+    ){
+
+        nav.style.display = "flex";
+
+    }else{
+
+        nav.style.display = "flex";
+
+    }
+
+}
+
+
+/* =========================================================
+   METER SETTINGS
+========================================================= */
+
+function loadSettingsForm(){
+
+    $("m1Name").value =
+        db.meters["1"].name || "Meter 1";
+
+    $("m1Number").value =
+        db.meters["1"].number || "";
+
+    $("m1Opening").value =
+        db.meters["1"].openingReading ?? 0;
+
+    $("m1OpeningDate").value =
+        db.meters["1"].openingDate || "";
+
+
+    $("m2Name").value =
+        db.meters["2"].name || "Meter 2";
+
+    $("m2Number").value =
+        db.meters["2"].number || "";
+
+    $("m2Opening").value =
+        db.meters["2"].openingReading ?? 0;
+
+    $("m2OpeningDate").value =
+        db.meters["2"].openingDate || "";
+
+
+    $("energyCharge").value =
+        db.charges.energy;
+
+    $("meterRent").value =
+        db.charges.rent;
+
+
+    renderRateRows();
+
+    renderVatRows();
+
+}
+
+
+function saveMeterSettings(){
+
+    db.meters["1"].name =
+        $("m1Name").value.trim() ||
+        "Meter 1";
+
+    db.meters["1"].number =
+        $("m1Number").value.trim();
+
+    db.meters["1"].openingReading =
+        num(
+            $("m1Opening").value
+        );
+
+    db.meters["1"].openingDate =
+        $("m1OpeningDate").value;
+
+
+    db.meters["2"].name =
+        $("m2Name").value.trim() ||
+        "Meter 2";
+
+    db.meters["2"].number =
+        $("m2Number").value.trim();
+
+    db.meters["2"].openingReading =
+        num(
+            $("m2Opening").value
+        );
+
+    db.meters["2"].openingDate =
+        $("m2OpeningDate").value;
+
+
+    saveDatabase();
+
+    showMessage(
+        "meterSettingsMessage",
+        "Meter settings saved successfully.",
+        "success"
+    );
+
+    renderAll();
+
+}
+
+
+/* =========================================================
+   RATE SETTINGS
+========================================================= */
+
+function renderRateRows(){
+
+    const container =
+        $("rateRows");
+
+    container.innerHTML = "";
+
+
+    if(
+        !Array.isArray(db.rates) ||
+        db.rates.length === 0
+    ){
+
+        addRateRow();
+
+        return;
+
+    }
+
+
+    db.rates.forEach(
+        function(rate,index){
+
+            addRateRow(
+                rate.from,
+                rate.to,
+                rate.rate,
+                index
+            );
+
+        }
+    );
+
+}
+
+
+function addRateRow(
+    from="",
+    to="",
+    rate="",
+    index=null
+){
+
+    const container =
+        $("rateRows");
+
+    const row =
+        document.createElement("div");
+
+    row.className =
+        "rate-row";
+
+
+    row.innerHTML = `
+
+        <div>
+
+            <label>
+                From Unit
+            </label>
+
+            <input
+                type="number"
+                min="0"
+                step="1"
+                class="rate-from"
+                value="${from}">
+
+        </div>
+
+
+        <div>
+
+            <label>
+                To Unit
+            </label>
+
+            <input
+                type="number"
+                min="0"
+                step="1"
+                class="rate-to"
+                value="${to}">
+
+        </div>
+
+
+        <div>
+
+            <label>
+                Rate
+            </label>
+
+            <input
+                type="number"
+                min="0"
+                step="0.01"
+                class="rate-value"
+                value="${rate}">
+
+        </div>
+
+
+        <div>
+
+            <button
+                type="button"
+                class="remove-btn"
+                onclick="this.closest('.rate-row').remove()">
+
+                Remove
+
+            </button>
+
+        </div>
+
+    `;
+
+
+    container.appendChild(row);
+
+}
+
+
+function saveRates(){
+
+    const rows =
+        Array.from(
+            document.querySelectorAll(
+                "#rateRows .rate-row"
+            )
+        );
+
+
+    const rates = [];
+
+
+    rows.forEach(
+        function(row){
+
+            const from =
+                num(
+                    row.querySelector(
+                        ".rate-from"
+                    ).value
+                );
+
+            const to =
+                num(
+                    row.querySelector(
+                        ".rate-to"
+                    ).value
+                );
+
+            const rate =
+                num(
+                    row.querySelector(
+                        ".rate-value"
+                    ).value
+                );
+
+
+            if(
+                to >= from &&
+                rate >= 0
+            ){
+
+                rates.push(
+                    {
+                        from,
+                        to,
+                        rate
+                    }
+                );
+
+            }
+
+        }
+    );
+
+
+    rates.sort(
+        function(a,b){
+
+            return a.from - b.from;
+
+        }
+    );
+
+
+    if(rates.length === 0){
+
+        showMessage(
+            "rateMessage",
+            "Please enter at least one valid rate row.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    db.rates = rates;
+
+    saveDatabase();
+
+    showMessage(
+        "rateMessage",
+        "Electricity rates saved successfully.",
+        "success"
+    );
+
+}
+
+
+/* =========================================================
+   UNIT BILL CALCULATION
+========================================================= */
+
+function billForUnits(unitCount){
+
+    const totalUnits =
+        Math.max(
+            0,
+            Math.floor(
+                num(unitCount)
+            )
+        );
+
+
+    if(totalUnits <= 0){
+
+        return 0;
+
+    }
+
+
+    const rates =
+        Array.isArray(db.rates)
+            ? db.rates
+            : [];
+
+
+    if(rates.length === 0){
+
+        return 0;
+
+    }
+
+
+    let bill = 0;
+
+
+    rates.forEach(
+        function(slab){
+
+            const from =
+                Math.max(
+                    0,
+                    Math.floor(
+                        num(slab.from)
+                    )
+                );
+
+            const to =
+                Math.max(
+                    from,
+                    Math.floor(
+                        num(slab.to)
+                    )
+                );
+
+            const rate =
+                num(slab.rate);
+
+
+            if(totalUnits < from){
+
+                return;
+
+            }
+
+
+            const upper =
+                Math.min(
+                    totalUnits,
+                    to
+                );
+
+
+            if(upper < from){
+
+                return;
+
+            }
+
+
+            const capacity =
+                upper - from + 1;
+
+
+            bill +=
+                capacity * rate;
+
+        }
+    );
+
+
+    return Math.round(
+        bill * 100
+    ) / 100;
+
+}
+
+
+/* =========================================================
+   MONTHLY CHARGES
+========================================================= */
+
+function saveCharges(){
+
+    const energy =
+        num(
+            $("energyCharge").value
+        );
+
+    const rent =
+        num(
+            $("meterRent").value
+        );
+
+
+    db.charges.energy =
+        energy;
+
+    db.charges.rent =
+        rent;
+
+
+    saveDatabase();
+
+
+    showMessage(
+        "chargeMessage",
+        "Monthly charges saved successfully.",
+        "success"
+    );
+
+
+    renderAll();
+
+}
+
+
+function monthlyChargeForMeter(
+    meterId,
+    month
+){
+
+    const hasReading =
+        db.readings.some(
+            function(r){
+
+                return (
+                    String(r.meterId) === String(meterId) &&
+                    monthKey(r.date) === month
+                );
+
+            }
+        );
+
+
+    if(!hasReading){
+
+        return {
+
+            energy:0,
+            rent:0
+
+        };
+
+    }
+
+
+    return {
+
+        energy:
+            num(db.charges.energy),
+
+        rent:
+            num(db.charges.rent)
+
+    };
+
+}
+
+
+/* =========================================================
+   VAT
+========================================================= */
+
+function findVat(
+    meterId,
+    month
+){
+
+    const item =
+        db.vat.find(
+            function(v){
+
+                return (
+                    String(v.meterId) === String(meterId) &&
+                    String(v.month) === String(month)
+                );
+
+            }
+        );
+
+
+    return item
+        ? num(item.amount)
+        : 0;
+
+}
+
+
+function renderVatRows(){
+
+    const container =
+        $("vatRows");
+
+    container.innerHTML = "";
+
+
+    if(
+        !Array.isArray(db.vat) ||
+        db.vat.length === 0
+    ){
+
+        addVatRow();
+
+        return;
+
+    }
+
+
+    db.vat.forEach(
+        function(item){
+
+            addVatRow(
+                item.meterId,
+                item.month,
+                item.amount
+            );
+
+        }
+    );
+
+}
+
+
+function addVatRow(
+    meterId="1",
+    month="",
+    amount=""
+){
+
+    const container =
+        $("vatRows");
+
+
+    const row =
+        document.createElement("div");
+
+    row.className =
+        "vat-row";
+
+
+    row.innerHTML = `
+
+        <div>
+
+            <label>
+                Meter
+            </label>
+
+            <select class="vat-meter">
+
+                <option
+                    value="1"
+                    ${String(meterId)==="1" ? "selected" : ""}>
+                    Meter 1
+                </option>
+
+                <option
+                    value="2"
+                    ${String(meterId)==="2" ? "selected" : ""}>
+                    Meter 2
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div>
+
+            <label>
+                Month
+            </label>
+
+            <input
+                type="month"
+                class="vat-month"
+                value="${month}">
+
+        </div>
+
+
+        <div>
+
+            <label>
+                VAT Amount
+            </label>
+
+            <input
+                type="number"
+                min="0"
+                step="1"
+                inputmode="decimal"
+                class="vat-amount"
+                value="${amount}">
+
+        </div>
+
+
+        <div>
+
+            <button
+                type="button"
+                class="remove-btn"
+                onclick="this.closest('.vat-row').remove()">
+
+                Remove
+
+            </button>
+
+        </div>
+
+    `;
+
+
+    container.appendChild(row);
+
+}
+
+
+function saveVat(){
+
+    const rows =
+        Array.from(
+            document.querySelectorAll(
+                "#vatRows .vat-row"
+            )
+        );
+
+
+    const vat = [];
+
+
+    rows.forEach(
+        function(row){
+
+            const meterId =
+                row.querySelector(
+                    ".vat-meter"
+                ).value;
+
+            const month =
+                row.querySelector(
+                    ".vat-month"
+                ).value;
+
+            const amount =
+                num(
+                    row.querySelector(
+                        ".vat-amount"
+                    ).value
+                );
+
+
+            if(
+                month &&
+                amount >= 0
+            ){
+
+                vat.push(
+                    {
+                        meterId,
+                        month,
+                        amount
+                    }
+                );
+
+            }
+
+        }
+    );
+
+
+    db.vat = vat;
+
+    saveDatabase();
+
+
+    showMessage(
+        "vatMessage",
+        "VAT entries saved successfully.",
+        "success"
+    );
+
+
+    renderAll();
+
+}
+
+
+/* =========================================================
+   READING FUNCTIONS
+========================================================= */
+
+function getReadingsForMeter(
+    meterId
+){
+
+    return db.readings
+        .filter(
+            function(r){
+
+                return String(r.meterId) === String(meterId);
+
+            }
+        )
+        .sort(
+            function(a,b){
+
+                if(a.date !== b.date){
+
+                    return a.date.localeCompare(
+                        b.date
+                    );
+
+                }
+
+                return (
+                    num(a.id) -
+                    num(b.id)
+                );
+
+            }
+        );
+
+}
+
+
+function getLatestReading(
+    meterId,
+    beforeDate=""
+){
+
+    const list =
+        getReadingsForMeter(
+            meterId
+        );
+
+
+    const filtered =
+        beforeDate
+            ? list.filter(
+                function(r){
+
+                    return r.date <= beforeDate;
+
+                }
+            )
+            : list;
+
+
+    if(filtered.length === 0){
+
+        return null;
+
+    }
+
+
+    return filtered[
+        filtered.length - 1
+    ];
+
+}
+
+
+function previousReadingValue(
+    meterId,
+    date
+){
+
+    const latest =
+        getLatestReading(
+            meterId,
+            date
+        );
+
+
+    if(
+        latest &&
+        latest.date < date
+    ){
+
+        return num(
+            latest.currentReading
+        );
+
+    }
+
+
+    const meter =
+        db.meters[
+            String(meterId)
+        ];
+
+
+    return num(
+        meter
+            ? meter.openingReading
+            : 0
+    );
+
+}
+
+
+function loadLatestForReading(){
+
+    const meterId =
+        $("readingMeter").value;
+
+    const date =
+        $("readingDate").value ||
+        today();
+
+
+    $("readingDate").value =
+        date;
+
+
+    const latest =
+        getLatestReading(
+            meterId,
+            date
+        );
+
+
+    let value = null;
+
+
+    if(latest){
+
+        value =
+            num(
+                latest.currentReading
+            );
+
+    }else{
+
+        const meter =
+            db.meters[
+                String(meterId)
+            ];
+
+        value =
+            num(
+                meter
+                    ? meter.openingReading
+                    : 0
+            );
+
+    }
+
+
+    $("currentReading").value =
+        value;
+
+
+    showMessage(
+        "readingMessage",
+        "Latest reading loaded. You can change the value before saving.",
+        "success"
+    );
+
+
+    previewReading();
+
+}
+
+
+function calculateReadingBill(
+    meterId,
+    date,
+    currentReading
+){
+
+    const current =
+        num(currentReading);
+
+
+    const previous =
+        previousReadingValue(
+            meterId,
+            date
+        );
+
+
+    const used =
+        Math.max(
+            0,
+            current - previous
+        );
+
+
+    const unitBill =
+        billForUnits(
+            used
+        );
+
+
+    const month =
+        monthKey(date);
+
+
+    const charge =
+        monthlyChargeForMeter(
+            meterId,
+            month
+        );
+
+
+    const vat =
+        findVat(
+            meterId,
+            month
+        );
+
+
+    const actual =
+        unitBill +
+        charge.energy +
+        charge.rent +
+        vat;
+
+
+    return {
+
+        previous,
+        current,
+        used,
+        unitBill,
+        energy:charge.energy,
+        rent:charge.rent,
+        vat,
+        actual,
+        month
+
+    };
+
+}
+
+
+function previewReading(){
+
+    const meterId =
+        $("readingMeter").value;
+
+    const date =
+        $("readingDate").value ||
+        today();
+
+    const current =
+        $("currentReading").value;
+
+
+    if(current === ""){
+
+        showMessage(
+            "readingMessage",
+            "Please enter the current meter reading.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const meter =
+        db.meters[
+            String(meterId)
+        ];
+
+
+    const result =
+        calculateReadingBill(
+            meterId,
+            date,
+            current
+        );
+
+
+    $("previewMeter").textContent =
+        meter
+            ? meter.name
+            : "Meter " + meterId;
+
+
+    $("previewDate").textContent =
+        formatDate(date);
+
+    $("previewPrevious").textContent =
+        units(result.previous);
+
+    $("previewCurrent").textContent =
+        units(result.current);
+
+    $("previewUnits").textContent =
+        units(result.used);
+
+    $("previewUnitBill").textContent =
+        money(result.unitBill);
+
+    $("previewEnergy").textContent =
+        money(result.energy);
+
+    $("previewRent").textContent =
+        money(result.rent);
+
+    $("previewVat").textContent =
+        money(result.vat);
+
+    $("previewActual").textContent =
+        money(result.actual);
+
+
+    $("readingPreview")
+        .classList.remove(
+            "hidden"
+        );
+
+}
+
+
+function saveReading(){
+
+    const meterId =
+        $("readingMeter").value;
+
+    const date =
+        $("readingDate").value ||
+        today();
+
+    const currentText =
+        $("currentReading").value;
+
+
+    if(currentText === ""){
+
+        showMessage(
+            "readingMessage",
+            "Please enter the current meter reading.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const current =
+        num(currentText);
+
+
+    const meter =
+        db.meters[
+            String(meterId)
+        ];
+
+
+    if(!meter){
+
+        showMessage(
+            "readingMessage",
+            "Meter settings were not found.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const previous =
+        previousReadingValue(
+            meterId,
+            date
+        );
+
+
+    if(current < previous){
+
+        showMessage(
+            "readingMessage",
+            "Current reading cannot be lower than the previous reading.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const duplicate =
+        db.readings.find(
+            function(r){
+
+                return (
+                    String(r.meterId) === String(meterId) &&
+                    r.date === date
+                );
+
+            }
+        );
+
+
+    if(duplicate){
+
+        const replace =
+            confirm(
+                "A reading already exists for this meter on this date.\n\nDo you want to replace it?"
+            );
+
+
+        if(!replace){
+
+            return;
+
+        }
+
+
+        duplicate.currentReading =
+            current;
+
+    }else{
+
+        db.readings.push(
+            {
+
+                id:
+                    Date.now(),
+
+                meterId:
+                    String(meterId),
+
+                date:
+                    date,
+
+                currentReading:
+                    current
+
+            }
+        );
+
+    }
+
+
+    db.readings.sort(
+        function(a,b){
+
+            return (
+                a.date.localeCompare(b.date)
+            );
+
+        }
+    );
+
+
+    saveDatabase();
+
+
+    showMessage(
+        "readingMessage",
+        "Reading saved successfully.",
+        "success"
+    );
+
+
+    $("readingPreview")
+        .classList.add(
+            "hidden"
+        );
+
+
+    renderAll();
+
+
+    $("currentReading").value =
+        "";
+
+
+    setTimeout(
+        function(){
+
+            $("readingMessage")
+                .classList.add(
+                    "hidden"
+                );
+
+        },
+        4000
+    );
+
+}
+
+
+/* =========================================================
+   DASHBOARD CALCULATION
+========================================================= */
+
+function calculateMeterSummary(
+    meterId
+){
+
+    const meter =
+        db.meters[
+            String(meterId)
+        ];
+
+
+    const readings =
+        getReadingsForMeter(
+            meterId
+        );
+
+
+    const currentReading =
+        readings.length
+            ? num(
+                readings[
+                    readings.length - 1
+                ].currentReading
+            )
+            : num(
+                meter
+                    ? meter.openingReading
+                    : 0
+            );
+
+
+    const opening =
+        num(
+            meter
+                ? meter.openingReading
+                : 0
+        );
+
+
+    const used =
+        Math.max(
+            0,
+            currentReading - opening
+        );
+
+
+    const unitBill =
+        billForUnits(
+            used
+        );
+
+
+    let energy = 0;
+    let rent = 0;
+    let vat = 0;
+
+
+    const months =
+        new Set();
+
+
+    readings.forEach(
+        function(r){
+
+            if(r.date){
+
+                months.add(
+                    monthKey(r.date)
+                );
+
+            }
+
+        }
+    );
+
+
+    months.forEach(
+        function(month){
+
+            const charge =
+                monthlyChargeForMeter(
+                    meterId,
+                    month
+                );
+
+            energy +=
+                charge.energy;
+
+            rent +=
+                charge.rent;
+
+            vat +=
+                findVat(
+                    meterId,
+                    month
+                );
+
+        }
+    );
+
+
+    const actual =
+        unitBill +
+        energy +
+        rent +
+        vat;
+
+
+    return {
+
+        currentReading,
+        opening,
+        used,
+        unitBill,
+        energy,
+        rent,
+        vat,
+        actual,
+        readings
+
+    };
+
+}
+
+
+function renderDashboard(){
+
+    const m1 =
+        calculateMeterSummary(
+            "1"
+        );
+
+    const m2 =
+        calculateMeterSummary(
+            "2"
+        );
+
+
+    $("dashM1Name").textContent =
+        db.meters["1"].name ||
+        "Meter 1";
+
+    $("dashM1Number").textContent =
+        "Meter number: " +
+        (
+            db.meters["1"].number ||
+            "-"
+        );
+
+
+    $("dashM2Name").textContent =
+        db.meters["2"].name ||
+        "Meter 2";
+
+    $("dashM2Number").textContent =
+        "Meter number: " +
+        (
+            db.meters["2"].number ||
+            "-"
+        );
+
+
+    $("dashM1Opening").textContent =
+        units(m1.opening);
+
+    $("dashM1Current").textContent =
+        units(m1.currentReading);
+
+    $("dashM1Units").textContent =
+        units(m1.used);
+
+    $("dashM1UnitBill").textContent =
+        money(m1.unitBill);
+
+    $("dashM1Energy").textContent =
+        money(m1.energy);
+
+    $("dashM1Rent").textContent =
+        money(m1.rent);
+
+    $("dashM1Vat").textContent =
+        money(m1.vat);
+
+    $("dashM1Actual").textContent =
+        money(m1.actual);
+
+
+    $("dashM2Opening").textContent =
+        units(m2.opening);
+
+    $("dashM2Current").textContent =
+        units(m2.currentReading);
+
+    $("dashM2Units").textContent =
+        units(m2.used);
+
+    $("dashM2UnitBill").textContent =
+        money(m2.unitBill);
+
+    $("dashM2Energy").textContent =
+        money(m2.energy);
+
+    $("dashM2Rent").textContent =
+        money(m2.rent);
+
+    $("dashM2Vat").textContent =
+        money(m2.vat);
+
+    $("dashM2Actual").textContent =
+        money(m2.actual);
+
+
+    $("dashM1Reading").textContent =
+        units(m1.currentReading);
+
+    $("dashM2Reading").textContent =
+        units(m2.currentReading);
+
+
+    $("dashTotalUnits").textContent =
+        units(
+            m1.used +
+            m2.used
+        );
+
+
+    $("dashTotalBill").textContent =
+        money(
+            m1.actual +
+            m2.actual
+        );
+
+
+    const allReadings =
+        [...db.readings]
+            .sort(
+                function(a,b){
+
+                    return (
+                        a.date.localeCompare(b.date)
+                    );
+
+                }
+            );
+
+
+    if(allReadings.length){
+
+        $("dashLastUpdate").textContent =
+            formatDate(
+                allReadings[
+                    allReadings.length - 1
+                ].date
+            );
+
+    }else{
+
+        $("dashLastUpdate").textContent =
+            "-";
+
+    }
+
+}
+
+
+/* =========================================================
+   HISTORY
+========================================================= */
+
+function renderHistory(){
+
+    const meterFilter =
+        $("historyMeter").value;
+
+    const from =
+        $("historyFrom").value;
+
+    const to =
+        $("historyTo").value;
+
+
+    let list =
+        [...db.readings];
+
+
+    if(meterFilter !== "all"){
+
+        list =
+            list.filter(
+                function(r){
+
+                    return (
+                        String(r.meterId) ===
+                        String(meterFilter)
+                    );
+
+                }
+            );
+
+    }
+
+
+    if(from){
+
+        list =
+            list.filter(
+                function(r){
+
+                    return r.date >= from;
+
+                }
+            );
+
+    }
+
+
+    if(to){
+
+        list =
+            list.filter(
+                function(r){
+
+                    return r.date <= to;
+
+                }
+            );
+
+    }
+
+
+    list.sort(
+        function(a,b){
+
+            return (
+                b.date.localeCompare(a.date)
+            );
+
+        }
+    );
+
+
+    const body =
+        $("historyBody");
+
+    body.innerHTML = "";
+
+
+    let totalUnits = 0;
+    let totalUnitBill = 0;
+    let totalEnergy = 0;
+    let totalRent = 0;
+    let totalVat = 0;
+    let totalActual = 0;
+
+
+    list.forEach(
+        function(r){
+
+            const result =
+                calculateReadingBill(
+                    r.meterId,
+                    r.date,
+                    r.currentReading
+                );
+
+
+            const meter =
+                db.meters[
+                    String(r.meterId)
+                ];
+
+
+            totalUnits +=
+                result.used;
+
+            totalUnitBill +=
+                result.unitBill;
+
+            totalEnergy +=
+                result.energy;
+
+            totalRent +=
+                result.rent;
+
+            totalVat +=
+                result.vat;
+
+            totalActual +=
+                result.actual;
+
+
+            const tr =
+                document.createElement("tr");
+
+
+            tr.innerHTML = `
+
+                <td>
+                    ${formatDate(r.date)}
+                </td>
+
+                <td>
+                    ${
+                        meter
+                            ? meter.name
+                            : "Meter " + r.meterId
+                    }
+                </td>
+
+                <td>
+                    ${units(result.previous)}
+                </td>
+
+                <td>
+                    ${units(result.current)}
+                </td>
+
+                <td class="amount">
+                    ${units(result.used)}
+                </td>
+
+                <td>
+                    ${money(result.unitBill)}
+                </td>
+
+                <td>
+                    ${money(result.energy)}
+                </td>
+
+                <td>
+                    ${money(result.rent)}
+                </td>
+
+                <td>
+                    ${money(result.vat)}
+                </td>
+
+                <td class="amount">
+                    ${money(result.actual)}
+                </td>
+
+            `;
+
+
+            body.appendChild(tr);
+
+        }
+    );
+
+
+    if(list.length === 0){
+
+        body.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="10"
+                    class="empty">
+
+                    No reading found.
+
+                </td>
+
+            </tr>
+
+        `;
+
+    }
+
+
+    if(list.length){
+
+        const tr =
+            document.createElement("tr");
+
+        tr.className =
+            "total-row";
+
+
+        tr.innerHTML = `
+
+            <td colspan="4">
+                Total
+            </td>
+
+            <td>
+                ${units(totalUnits)}
+            </td>
+
+            <td>
+                ${money(totalUnitBill)}
+            </td>
+
+            <td>
+                ${money(totalEnergy)}
+            </td>
+
+            <td>
+                ${money(totalRent)}
+            </td>
+
+            <td>
+                ${money(totalVat)}
+            </td>
+
+            <td>
+                ${money(totalActual)}
+            </td>
+
+        `;
+
+
+        body.appendChild(tr);
+
+    }
+
+
+    $("historySummary").innerHTML =
+
+        "<strong>" +
+        list.length +
+        "</strong> reading(s) found. " +
+
+        "Total units: <strong>" +
+        units(totalUnits) +
+        "</strong>. " +
+
+        "Total actual bill: <strong>" +
+        money(totalActual) +
+        "</strong>.";
+
+}
+
+
+/* =========================================================
+   BACKUP
+========================================================= */
+
+function downloadBackup(){
+
+    saveDatabase();
+
+
+    const backup = {
+
+        app:
+            "Current Bill Tracker",
+
+        version:
+            APP_VERSION,
+
+        exportedAt:
+            new Date().toISOString(),
+
+        data:
+            db
 
     };
 
 
-  reader.readAsText(
-    file
-  );
+    const blob =
+        new Blob(
+            [
+                JSON.stringify(
+                    backup,
+                    null,
+                    2
+                )
+            ],
+            {
+                type:
+                    "application/json"
+            }
+        );
+
+
+    const url =
+        URL.createObjectURL(
+            blob
+        );
+
+
+    const a =
+        document.createElement("a");
+
+
+    const stamp =
+        new Date()
+            .toISOString()
+            .replace(
+                /[:.]/g,
+                "-"
+            );
+
+
+    a.href =
+        url;
+
+    a.download =
+        "current-bill-tracker-backup-" +
+        stamp +
+        ".json";
+
+
+    document.body.appendChild(a);
+
+    a.click();
+
+    a.remove();
+
+
+    setTimeout(
+        function(){
+
+            URL.revokeObjectURL(
+                url
+            );
+
+        },
+        1000
+    );
+
+
+    showMessage(
+        "backupMessage",
+        "Backup file downloaded successfully.",
+        "success"
+    );
 
 }
 
 
-/* =====================================================
-   NAVIGATION
-===================================================== */
+function restoreBackupFile(file){
 
-function showPage(page){
+    if(!file){
 
-  document
-    .querySelectorAll(
-      ".page"
-    )
-    .forEach(
-      section=>{
+        return;
 
-        section.classList.remove(
-          "active"
+    }
+
+
+    const reader =
+        new FileReader();
+
+
+    reader.onload =
+        function(event){
+
+            try{
+
+                const backup =
+                    JSON.parse(
+                        event.target.result
+                    );
+
+
+                let restored =
+                    backup.data
+                    ? backup.data
+                    : backup;
+
+
+                if(
+                    !restored ||
+                    typeof restored !== "object"
+                ){
+
+                    throw new Error(
+                        "Invalid backup"
+                    );
+
+                }
+
+
+                if(
+                    !restored.meters ||
+                    !restored.readings
+                ){
+
+                    throw new Error(
+                        "This is not a valid Current Bill Tracker backup."
+                    );
+
+                }
+
+
+                const ok =
+                    confirm(
+                        "Restore this backup?\n\nCurrent app data will be replaced."
+                    );
+
+
+                if(!ok){
+
+                    $("restoreFile").value =
+                        "";
+
+                    return;
+
+                }
+
+
+                db = {
+
+                    ...JSON.parse(
+                        JSON.stringify(
+                            DEFAULT_DB
+                        )
+                    ),
+
+                    ...restored
+
+                };
+
+
+                if(!Array.isArray(db.readings)){
+
+                    db.readings = [];
+
+                }
+
+
+                if(!Array.isArray(db.rates)){
+
+                    db.rates = [];
+
+                }
+
+
+                if(!Array.isArray(db.vat)){
+
+                    db.vat = [];
+
+                }
+
+
+                if(!db.charges){
+
+                    db.charges = {
+
+                        energy:42,
+                        rent:10
+
+                    };
+
+                }
+
+
+                if(!db.meters){
+
+                    db.meters =
+                        JSON.parse(
+                            JSON.stringify(
+                                DEFAULT_DB.meters
+                            )
+                        );
+
+                }
+
+
+                db.version =
+                    APP_VERSION;
+
+
+                saveDatabase();
+
+
+                renderAll();
+
+                loadSettingsForm();
+
+                renderBackupInfo();
+
+
+                showMessage(
+                    "backupMessage",
+                    "Backup restored successfully.",
+                    "success"
+                );
+
+
+                $("restoreFile").value =
+                    "";
+
+
+            }catch(error){
+
+                console.error(error);
+
+
+                showMessage(
+                    "backupMessage",
+                    "Restore failed. Please select a valid Current Bill Tracker backup file.",
+                    "error"
+                );
+
+            }
+
+        };
+
+
+    reader.readAsText(file);
+
+}
+
+
+/* =========================================================
+   BACKUP INFORMATION
+========================================================= */
+
+function renderBackupInfo(){
+
+    $("backupReadingCount").textContent =
+        db.readings.length;
+
+
+    $("backupVatCount").textContent =
+        db.vat.length;
+
+
+    $("backupRateCount").textContent =
+        db.rates.length;
+
+}
+
+
+/* =========================================================
+   MESSAGE
+========================================================= */
+
+function showMessage(
+    id,
+    text,
+    type="success"
+){
+
+    const el =
+        $(id);
+
+
+    if(!el){
+
+        return;
+
+    }
+
+
+    el.className =
+        type;
+
+
+    el.textContent =
+        text;
+
+}
+
+
+/* =========================================================
+   RENDER ALL
+========================================================= */
+
+function renderAll(){
+
+    try{
+
+        renderDashboard();
+
+    }catch(error){
+
+        console.error(
+            "Dashboard render error:",
+            error
         );
 
-      }
-    );
+    }
 
 
-  const target =
-    $("page-"+page);
+    try{
 
+        renderHistory();
 
-  if(target){
+    }catch(error){
 
-    target.classList.add(
-      "active"
-    );
-
-  }
-
-
-  document
-    .querySelectorAll(
-      "#mainNav button"
-    )
-    .forEach(
-      button=>{
-
-        button.classList.toggle(
-          "active",
-          button.dataset.page===
-          page
+        console.error(
+            "History render error:",
+            error
         );
 
-      }
-    );
+    }
 
 
-  if(page==="dashboard")
-    renderDashboard();
+    try{
+
+        renderBackupInfo();
+
+    }catch(error){
+
+        console.error(
+            "Backup render error:",
+            error
+        );
+
+    }
+
+}
 
 
-  if(page==="reading"){
+/* =========================================================
+   INITIAL SETUP
+========================================================= */
 
-    renderReadingInfo();
+function initializeApp(){
 
-    renderReadingPreview();
-
-  }
-
-
-  if(page==="history")
-    renderHistory();
+    loadDatabase();
 
 
-  if(page==="settings"){
+    $("readingDate").value =
+        today();
+
+
+    $("historyTo").value =
+        today();
+
+
+    const firstDate =
+        db.readings.length
+            ? db.readings
+                .map(
+                    function(r){
+
+                        return r.date;
+
+                    }
+                )
+                .sort()[0]
+            : "";
+
+
+    $("historyFrom").value =
+        firstDate;
+
 
     loadSettingsForm();
 
-    renderRateRows();
 
-    renderVatList();
+    renderAll();
 
-  }
+
+    $("restoreFile")
+        .addEventListener(
+            "change",
+            function(event){
+
+                const file =
+                    event.target.files[0];
+
+                restoreBackupFile(
+                    file
+                );
+
+            }
+        );
+
+
+    $("readingMeter")
+        .addEventListener(
+            "change",
+            function(){
+
+                $("readingPreview")
+                    .classList.add(
+                        "hidden"
+                    );
+
+            }
+        );
+
+
+    $("readingDate")
+        .addEventListener(
+            "change",
+            function(){
+
+                $("readingPreview")
+                    .classList.add(
+                        "hidden"
+                    );
+
+            }
+        );
+
+
+    $("currentReading")
+        .addEventListener(
+            "input",
+            function(){
+
+                $("readingPreview")
+                    .classList.add(
+                        "hidden"
+                    );
+
+            }
+        );
 
 }
 
 
-/* =====================================================
-   EVENTS
-===================================================== */
-
-document
-  .querySelectorAll(
-    "#mainNav button"
-  )
-  .forEach(
-    button=>{
-
-      button.addEventListener(
-        "click",
-        ()=>{
-
-          showPage(
-            button.dataset.page
-          );
-
-        }
-      );
-
-    }
-  );
-
-
-$("readingMeter")
-  .addEventListener(
-    "change",
-    ()=>{
-      renderReadingInfo();
-      renderReadingPreview();
-    }
-  );
-
-
-$("readingDate")
-  .addEventListener(
-    "input",
-    renderReadingPreview
-  );
-
-
-$("readingValue")
-  .addEventListener(
-    "input",
-    renderReadingPreview
-  );
-
-
-$("saveReadingBtn")
-  .addEventListener(
-    "click",
-    saveReading
-  );
-
-
-$("loadLatestBtn")
-  .addEventListener(
-    "click",
-    loadLatestReading
-  );
-
-
-$("historyMeter")
-  .addEventListener(
-    "change",
-    renderHistory
-  );
-
-
-$("historyMonth")
-  .addEventListener(
-    "input",
-    renderHistory
-  );
-
-
-$("saveMeterSettingsBtn")
-  .addEventListener(
-    "click",
-    saveMeterSettings
-  );
-
-
-$("addRateBtn")
-  .addEventListener(
-    "click",
-    addRate
-  );
-
-
-$("saveRatesBtn")
-  .addEventListener(
-    "click",
-    saveRates
-  );
-
-
-$("energyChargeInput")
-  .addEventListener(
-    "change",
-    saveCharges
-  );
-
-
-$("meterRentInput")
-  .addEventListener(
-    "change",
-    saveCharges
-  );
-
-
-$("saveVatBtn")
-  .addEventListener(
-    "click",
-    saveVat
-  );
-
-
-$("backupBtn")
-  .addEventListener(
-    "click",
-    backupData
-  );
-
-
-$("restoreBtn")
-  .addEventListener(
-    "click",
-    ()=>{
-      $("restoreFile").click();
-    }
-  );
-
-
-$("restoreFile")
-  .addEventListener(
-    "change",
-    event=>{
-
-      restoreData(
-        event.target.files[0]
-      );
-
-      event.target.value="";
-
-    }
-  );
-
-
-/* =====================================================
+/* =========================================================
    START
-===================================================== */
+========================================================= */
 
-$("readingDate").value =
-  todayString();
-
-
-$("vatMonth").value =
-  todayString().slice(0,7);
-
-
-loadDatabase();
-
-
-loadSettingsForm();
-
-
-renderDashboard();
-
-
-renderReadingInfo();
-
-
-renderReadingPreview();
-
-
-renderHistory();
-
-
-renderRateRows();
-
-
-renderVatList();
+document.addEventListener(
+    "DOMContentLoaded",
+    initializeApp
+);
 
 </script>
 
