@@ -2786,7 +2786,6 @@ function saveRates(){
 /* =========================================================
    UNIT BILL CALCULATION
 ========================================================= */
-
 function billForUnits(unitCount){
 
     const totalUnits =
@@ -2797,89 +2796,92 @@ function billForUnits(unitCount){
             )
         );
 
-
     if(totalUnits <= 0){
-
         return 0;
-
     }
-
 
     const rates =
         Array.isArray(db.rates)
             ? db.rates
             : [];
 
-
     if(rates.length === 0){
-
         return 0;
-
     }
-
 
     let bill = 0;
 
+    rates.forEach(function(slab){
 
-    rates.forEach(
-        function(slab){
+        let from =
+            Math.floor(
+                num(slab.from)
+            );
 
-            const from =
-                Math.max(
-                    0,
-                    Math.floor(
-                        num(slab.from)
-                    )
-                );
+        const to =
+            Math.floor(
+                num(slab.to)
+            );
 
-            const to =
-                Math.max(
-                    from,
-                    Math.floor(
-                        num(slab.to)
-                    )
-                );
+        /*
+         * Rate-এর দশমিক অংশ সম্পূর্ণ রাখা হবে।
+         * এখানে Math.round() করা যাবে না।
+         */
+        const rate =
+            num(slab.rate);
 
-            const rate =
-                num(slab.rate);
-
-
-            if(totalUnits < from){
-
-                return;
-
-            }
-
-
-            const upper =
-                Math.min(
-                    totalUnits,
-                    to
-                );
-
-
-            if(upper < from){
-
-                return;
-
-            }
-
-
-            const capacity =
-                upper - from + 1;
-
-
-            bill +=
-                capacity * rate;
-
+        /*
+         * পুরোনো Settings-এ যদি প্রথম slab 0-50 থাকে,
+         * সেটিকে হিসাবের জন্য 1-50 হিসেবে ধরা হবে।
+         */
+        if(from <= 0){
+            from = 1;
         }
-    );
 
+        if(
+            to < from ||
+            rate < 0
+        ){
+            return;
+        }
 
+        if(totalUnits < from){
+            return;
+        }
+
+        const upper =
+            Math.min(
+                totalUnits,
+                to
+            );
+
+        if(upper < from){
+            return;
+        }
+
+        const slabUnits =
+            upper - from + 1;
+
+        /*
+         * এখানে আসল দশমিক rate দিয়েই গুণ হবে।
+         *
+         * যেমন:
+         * 10 × 4.62 = 46.20
+         * 25 × 5.26 = 131.50
+         */
+        bill +=
+            slabUnits * rate;
+
+    });
+
+    /*
+     * Slab-এর মাঝখানে কোনো rounding নয়।
+     * শুধু unit bill-এর final result 2 decimal
+     * পর্যন্ত রাখা হচ্ছে।
+     */
     return Math.round(
         bill * 100
     ) / 100;
-
 }
 
 
