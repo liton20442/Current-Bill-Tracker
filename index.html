@@ -770,8 +770,6 @@ hr{
             Dashboard
         </h2>
 
-        
-
     </div>
 
 
@@ -2795,11 +2793,12 @@ function saveRates(){
 
 /* =========================================================
    UNIT BILL CALCULATION
+   CORRECTED TARIFF LOGIC
 ========================================================= */
 
 function billForUnits(unitCount){
 
-    const totalUnits =
+    const u =
         Math.max(
             0,
             Math.floor(
@@ -2807,20 +2806,8 @@ function billForUnits(unitCount){
             )
         );
 
-    if(totalUnits <= 0){
 
-        return 0;
-
-    }
-
-
-    const rates =
-        Array.isArray(db.rates)
-            ? db.rates
-            : [];
-
-
-    if(rates.length === 0){
+    if(u <= 0){
 
         return 0;
 
@@ -2830,88 +2817,125 @@ function billForUnits(unitCount){
     let bill = 0;
 
 
-    rates.forEach(
-        function(slab){
+    /*
+     * 0-50:
+     * পুরো ব্যবহৃত ইউনিট 4.63 টাকা হারে
+     */
 
-            let from =
-                Math.floor(
-                    num(slab.from)
-                );
+    if(u <= 50){
 
+        bill =
+            u * 4.63;
 
-            const to =
-                Math.floor(
-                    num(slab.to)
-                );
+    }
 
 
-            const rate =
-                num(slab.rate);
+    /*
+     * 51-75:
+     * পুরো ব্যবহৃত ইউনিট 5.26 টাকা হারে
+     *
+     * উদাহরণ:
+     * 60 ইউনিট = 60 × 5.26
+     * 75 ইউনিট = 75 × 5.26
+     */
+
+    else if(u <= 75){
+
+        bill =
+            u * 5.26;
+
+    }
 
 
-            /*
-             * First slab 0-50 is treated as 1-50.
-             */
+    /*
+     * 76-200:
+     * প্রথম 75 ইউনিট × 5.26
+     * 76 থেকে অতিরিক্ত ইউনিট × 8.50
+     */
 
-            if(from <= 0){
+    else if(u <= 200){
 
-                from = 1;
+        bill =
+            (75 * 5.26) +
+            ((u - 75) * 8.50);
 
-            }
-
-
-            if(
-                to < from ||
-                rate < 0
-            ){
-
-                return;
-
-            }
+    }
 
 
-            if(totalUnits < from){
+    /*
+     * 201-300:
+     * প্রথম 75 ইউনিট × 5.26
+     * পরের 125 ইউনিট × 8.50
+     * 201 থেকে অতিরিক্ত ইউনিট × 9.10
+     */
 
-                return;
+    else if(u <= 300){
 
-            }
+        bill =
+            (75 * 5.26) +
+            (125 * 8.50) +
+            ((u - 200) * 9.10);
 
-
-            const upper =
-                Math.min(
-                    totalUnits,
-                    to
-                );
-
-
-            if(upper < from){
-
-                return;
-
-            }
+    }
 
 
-            const slabUnits =
-                upper - from + 1;
+    /*
+     * 301-400:
+     * প্রথম 75 ইউনিট × 5.26
+     * পরের 125 ইউনিট × 8.50
+     * পরের 100 ইউনিট × 9.10
+     * 301 থেকে অতিরিক্ত ইউনিট × 9.62
+     */
+
+    else if(u <= 400){
+
+        bill =
+            (75 * 5.26) +
+            (125 * 8.50) +
+            (100 * 9.10) +
+            ((u - 300) * 9.62);
+
+    }
 
 
-            /*
-             * Progressive building rate calculation.
-             *
-             * 1-50   × 4.63
-             * 51-75  × 5.26
-             * 76-200 × 8.50
-             * 201-300 × 9.10
-             * 301-400 × 9.62
-             * 401-600 × 15.00
-             * 601+    × 15.00
-             */
+    /*
+     * 401-600:
+     * প্রথম 75 ইউনিট × 5.26
+     * পরের 125 ইউনিট × 8.50
+     * পরের 100 ইউনিট × 9.10
+     * পরের 100 ইউনিট × 9.62
+     * 401 থেকে অতিরিক্ত ইউনিট × 15.00
+     */
 
-            bill +=
-                slabUnits * rate;
+    else if(u <= 600){
 
-        }
-    );
+        bill =
+            (75 * 5.26) +
+            (125 * 8.50) +
+            (100 * 9.10) +
+            (100 * 9.62) +
+            ((u - 400) * 15.00);
+
+    }
+
+
+    /*
+     * 601 ইউনিটের বেশি:
+     * 600 পর্যন্ত হিসাবের সঙ্গে
+     * অতিরিক্ত ইউনিট × 15.00
+     */
+
+    else{
+
+        bill =
+            (75 * 5.26) +
+            (125 * 8.50) +
+            (100 * 9.10) +
+            (100 * 9.62) +
+            (200 * 15.00) +
+            ((u - 600) * 15.00);
+
+    }
 
 
     return Math.round(
