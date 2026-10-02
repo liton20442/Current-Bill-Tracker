@@ -3999,11 +3999,21 @@ function renderDashboard(){
         units(m2.currentReading);
 
 
-    $("dashTotalUnits").textContent =
-        units(
-            m1.used +
-            m2.used
-        );
+    const totalUsedUnits =
+    Math.max(
+        0,
+        num(m1.currentReading) -
+        num(m1.opening)
+    ) +
+    Math.max(
+        0,
+        num(m2.currentReading) -
+        num(m2.opening)
+    );
+
+
+$("dashTotalUnits").textContent =
+    units(totalUsedUnits);
 
 
     $("dashTotalBill").textContent =
