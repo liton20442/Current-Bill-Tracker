@@ -8,9 +8,10 @@
   "lang": "en",
   "icons": [
     {
-     "src": "current-bill-tracker-icon-180.png",
+      "src": "./current-bill-tracker-icon-180.png",
       "sizes": "180x180",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     }
   ]
 }
