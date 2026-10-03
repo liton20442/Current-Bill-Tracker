@@ -1,10 +1,10 @@
-const CACHE_NAME = "current-bill-tracker-v2";
+const CACHE_NAME = "current-bill-tracker-v3";
 
 const APP_SHELL = [
   "./",
   "./index.html",
   "./manifest.json",
-  "./current-bill-tracker-icon-180.png",
+  "./cbt-icon-180-v2.png",
   "./SW.js"
 ];
 
