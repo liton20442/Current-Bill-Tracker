@@ -8,7 +8,7 @@
   "lang": "en",
   "icons": [
     {
-     "src": "./cbt-icon-180-v3.png"
+      "src": "./cbt-icon-180-v3.png",
       "sizes": "180x180",
       "type": "image/png",
       "purpose": "any"
