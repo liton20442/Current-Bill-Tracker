@@ -5,7 +5,7 @@ const APP_SHELL = [
   "./index.html",
   "./manifest.json",
   "./current-bill-tracker-icon-180.png",
-  "./sw.js"
+  "./SW.js"
 ];
 
 self.addEventListener("install", event => {
